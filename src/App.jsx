@@ -502,5 +502,9 @@ function App() {
         Szacowany czas pracy przy {workers} pracownikach:{" "}
         {hoursWithWorkers.toFixed(1)} godz.
       </p>
+</div>
+  );
+}
 
+export default App;
 export default App;
