@@ -311,4 +311,152 @@ function App() {
                     onBlur={() => setTimeout(() => setOpenIndex(null), 150)}
                     placeholder="Wpisz np. 'm' dla malowania"
                   />
-                  {openIndex === idx && suggest
+                  {openIndex === idx && suggestions.length > 0 && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        right: 0,
+                        top: "100%",
+                        background: "#222",
+                        border: "1px solid #555",
+                        zIndex: 10,
+                        maxHeight: 150,
+                        overflowY: "auto",
+                      }}
+                    >
+                      {suggestions.map((s) => (
+                        <div
+                          key={s.name}
+                          style={{ padding: "4px 8px", cursor: "pointer" }}
+                          onMouseDown={() => pickService(idx, s)}
+                        >
+                          {s.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  <input
+                    style={{ width: 70, textAlign: "right" }}
+                    type="number"
+                    min={0}
+                    value={item.qty}
+                    onChange={(e) => handleChange(idx, "qty", e.target.value)}
+                  />
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  <input
+                    style={{ width: 60, textAlign: "center" }}
+                    value={item.unit}
+                    onChange={(e) => handleChange(idx, "unit", e.target.value)}
+                  />
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  <input
+                    style={{ width: 90, textAlign: "right" }}
+                    type="number"
+                    step="0.01"
+                    min={0}
+                    value={item.laborPrice}
+                    onChange={(e) => handleChange(idx, "laborPrice", e.target.value)}
+                  />
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  <input
+                    style={{ width: 90, textAlign: "right" }}
+                    type="number"
+                    step="0.01"
+                    min={0}
+                    value={item.materialPrice}
+                    onChange={(e) => handleChange(idx, "materialPrice", e.target.value)}
+                  />
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  <input
+                    style={{ width: 80, textAlign: "right" }}
+                    type="number"
+                    step="0.01"
+                    min={0}
+                    value={item.rhPerUnit}
+                    onChange={(e) => handleChange(idx, "rhPerUnit", e.target.value)}
+                  />
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  <button
+                    onClick={() => removeItem(idx)}
+                    style={{
+                      background: "#dc2626",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 4,
+                      padding: "4px 8px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    🗑️
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      <div style={{ marginTop: 16 }}>
+        <button
+          onClick={addItem}
+          disabled={items.length >= maxItems}
+          style={{
+            padding: "8px 16px",
+            background: items.length >= maxItems ? "#444" : "#0f766e",
+            color: "#fff",
+            border: "none",
+            borderRadius: 4,
+            cursor: items.length >= maxItems ? "not-allowed" : "pointer",
+          }}
+        >
+          Dodaj pozycję
+        </button>
+
+        <button
+          onClick={handleDownloadPdf}
+          style={{
+            marginLeft: 12,
+            padding: "8px 16px",
+            background: "#1d4ed8",
+            color: "#fff",
+            border: "none",
+            borderRadius: 4,
+            cursor: "pointer",
+          }}
+        >
+          Pobierz PDF (demo)
+        </button>
+      </div>
+
+      <h2 style={{ marginTop: 24 }}>
+        Suma robocizny: {totalLabor.toFixed(2)} {currency}
+      </h2>
+      <h2>
+        Suma materiałów:{" "}
+        {materialsBy === "contractor"
+          ? `${totalMaterials.toFixed(2)} ${currency} (po stronie wykonawcy)`
+          : `0 ${currency} (materiał klienta)`}
+      </h2>
+
+      <h3 style={{ marginTop: 16 }}>Podsumowanie dla klienta:</h3>
+      <p>Razem netto: {totalForClient.toFixed(2)} {currency}</p>
+      <p>VAT {vatRate}%: {vatAmount.toFixed(2)} {currency}</p>
+      <p>Razem brutto: {totalBrutto.toFixed(2)} {currency}</p>
+
+      <p style={{ marginTop: 16 }}>Łącznie roboczogodzin (RH): {totalRH.toFixed(2)}</p>
+      <p>
+        Szacowany czas pracy przy {workers} pracownikach: {hoursWithWorkers.toFixed(1)} godz.
+      </p>
+    </div>
+  );
+}
+
+export default App;
