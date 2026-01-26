@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useState } from "react";
 import { jsPDF } from "jspdf";
 
 const SERVICES = [
@@ -95,7 +94,7 @@ const SERVICES = [
 function App() {
   const [items, setItems] = useState([
     {
-      name: "Malowanie ścian 2x (biała)",
+      name: "Malowanie ścian dwukrotne (farba biała)",
       unit: "m²",
       qty: 50,
       laborPrice: 32,
@@ -103,7 +102,7 @@ function App() {
       rhPerUnit: 0.25,
     },
     {
-      name: "Gładź gipsowa ścian",
+      name: "Gładź gipsowa na ścianach",
       unit: "m²",
       qty: 30,
       laborPrice: 45,
@@ -166,34 +165,38 @@ function App() {
     setOpenIndex(null);
   };
 
-    const handleDownloadPdf = () => {
+  const handleDownloadPdf = () => {
     const doc = new jsPDF();
-    
+
     doc.setFontSize(16);
     doc.text("Kosztorys remontowy 2026", 20, 20);
-    
+
     doc.setFontSize(10);
     doc.text(`Waluta: ${currency}`, 20, 30);
     doc.text(`VAT: ${vatRate}%`, 20, 35);
     doc.text(`Liczba pracownikow: ${workers}`, 20, 40);
-    
+
     let y = 50;
     doc.setFontSize(12);
     doc.text("Pozycje:", 20, y);
     y += 7;
-    
+
     items.forEach((item, idx) => {
       const line = `${idx + 1}. ${item.name} - ${item.qty} ${item.unit} x ${item.laborPrice} ${currency} = ${(item.qty * item.laborPrice).toFixed(2)} ${currency}`;
       doc.setFontSize(9);
       doc.text(line, 20, y);
       y += 6;
     });
-    
+
     y += 5;
     doc.setFontSize(11);
     doc.text(`Suma robocizny: ${totalLabor.toFixed(2)} ${currency}`, 20, y);
     y += 6;
-    doc.text(`Suma materialow: ${(materialsBy === "contractor" ? totalMaterials : 0).toFixed(2)} ${currency}`, 20, y);
+    doc.text(
+      `Suma materialow: ${(materialsBy === "contractor" ? totalMaterials : 0).toFixed(2)} ${currency}`,
+      20,
+      y
+    );
     y += 6;
     doc.text(`Razem netto: ${totalForClient.toFixed(2)} ${currency}`, 20, y);
     y += 6;
@@ -202,10 +205,9 @@ function App() {
     doc.text(`Razem brutto: ${totalBrutto.toFixed(2)} ${currency}`, 20, y);
     y += 10;
     doc.text(`Laczne RH: ${totalRH.toFixed(2)} godz.`, 20, y);
-    
+
     doc.save("kosztorys-demo.pdf");
   };
-
 
   return (
     <div
@@ -309,152 +311,4 @@ function App() {
                     onBlur={() => setTimeout(() => setOpenIndex(null), 150)}
                     placeholder="Wpisz np. 'm' dla malowania"
                   />
-                  {openIndex === idx && suggestions.length > 0 && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        left: 0,
-                        right: 0,
-                        top: "100%",
-                        background: "#222",
-                        border: "1px solid #555",
-                        zIndex: 10,
-                        maxHeight: 150,
-                        overflowY: "auto",
-                      }}
-                    >
-                      {suggestions.map((s) => (
-                        <div
-                          key={s.name}
-                          style={{ padding: "4px 8px", cursor: "pointer" }}
-                          onMouseDown={() => pickService(idx, s)}
-                        >
-                          {s.name}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  <input
-                    style={{ width: 70, textAlign: "right" }}
-                    type="number"
-                    min={0}
-                    value={item.qty}
-                    onChange={(e) => handleChange(idx, "qty", e.target.value)}
-                  />
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  <input
-                    style={{ width: 60, textAlign: "center" }}
-                    value={item.unit}
-                    onChange={(e) => handleChange(idx, "unit", e.target.value)}
-                  />
-                </td>
-                <td style={{ textAlign: "right" }}>
-                  <input
-                    style={{ width: 90, textAlign: "right" }}
-                    type="number"
-                    step="0.01"
-                    min={0}
-                    value={item.laborPrice}
-                    onChange={(e) => handleChange(idx, "laborPrice", e.target.value)}
-                  />
-                </td>
-                <td style={{ textAlign: "right" }}>
-                  <input
-                    style={{ width: 90, textAlign: "right" }}
-                    type="number"
-                    step="0.01"
-                    min={0}
-                    value={item.materialPrice}
-                    onChange={(e) => handleChange(idx, "materialPrice", e.target.value)}
-                  />
-                </td>
-                <td style={{ textAlign: "right" }}>
-                  <input
-                    style={{ width: 80, textAlign: "right" }}
-                    type="number"
-                    step="0.01"
-                    min={0}
-                    value={item.rhPerUnit}
-                    onChange={(e) => handleChange(idx, "rhPerUnit", e.target.value)}
-                  />
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  <button
-                    onClick={() => removeItem(idx)}
-                    style={{
-                      background: "#dc2626",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 4,
-                      padding: "4px 8px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    🗑️
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-
-      <div style={{ marginTop: 16 }}>
-        <button
-          onClick={addItem}
-          disabled={items.length >= maxItems}
-          style={{
-            padding: "8px 16px",
-            background: items.length >= maxItems ? "#444" : "#0f766e",
-            color: "#fff",
-            border: "none",
-            borderRadius: 4,
-            cursor: items.length >= maxItems ? "not-allowed" : "pointer",
-          }}
-        >
-          Dodaj pozycję
-        </button>
-
-        <button
-          onClick={handleDownloadPdf}
-          style={{
-            marginLeft: 12,
-            padding: "8px 16px",
-            background: "#1d4ed8",
-            color: "#fff",
-            border: "none",
-            borderRadius: 4,
-            cursor: "pointer",
-          }}
-        >
-          Pobierz PDF (demo)
-        </button>
-      </div>
-
-      <h2 style={{ marginTop: 24 }}>
-        Suma robocizny: {totalLabor.toFixed(2)} {currency}
-      </h2>
-      <h2>
-        Suma materiałów:{" "}
-        {materialsBy === "contractor"
-          ? `${totalMaterials.toFixed(2)} ${currency} (po stronie wykonawcy)`
-          : `0 ${currency} (materiał klienta)`}
-      </h2>
-
-      <h3 style={{ marginTop: 16 }}>Podsumowanie dla klienta:</h3>
-      <p>Razem netto: {totalForClient.toFixed(2)} {currency}</p>
-      <p>VAT {vatRate}%: {vatAmount.toFixed(2)} {currency}</p>
-      <p>Razem brutto: {totalBrutto.toFixed(2)} {currency}</p>
-
-      <p style={{ marginTop: 16 }}>Łącznie roboczogodzin (RH): {totalRH.toFixed(2)}</p>
-      <p>
-        Szacowany czas pracy przy {workers} pracownikach: {hoursWithWorkers.toFixed(1)} godz.
-      </p>
-    </div>
-  );
-}
-
-export default App;
+                  {openIndex === idx && suggest
