@@ -461,8 +461,6 @@ function App() {
         onClick={addItem}
         ...
       >
-        Dodaj pozycję
-      </button>
 
       <button
         onClick={handleDownloadPdf}
