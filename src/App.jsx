@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const SERVICES const SERVICES = [
+  const SERVICES = [
   // MALOWANIE / PRZYGOTOWANIE
   { name: "Malowanie ścian jednokrotne (farba biała)", rhPerUnit: 0.15 },
   { name: "Malowanie ścian dwukrotne (farba biała)", rhPerUnit: 0.25 },
