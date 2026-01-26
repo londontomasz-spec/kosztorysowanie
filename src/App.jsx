@@ -36,9 +36,7 @@ function App() {
 
   const [workers, setWorkers] = useState(1);
   const [openIndex, setOpenIndex] = useState(null);
-  const [materialsBy, setMaterialsBy] = useState<"contractor" | "client">(
-    "contractor"
-  );
+  const [materialsBy, setMaterialsBy] = useState("contractor"); // wykonawca / klient
   const maxItems = 3;
 
   const totalLabor = items.reduce(
