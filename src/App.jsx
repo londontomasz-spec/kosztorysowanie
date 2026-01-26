@@ -440,7 +440,7 @@ function App() {
         </tbody>
       </table>
 
-            <button
+                  <button
         onClick={addItem}
         disabled={items.length >= maxItems}
         style={{
@@ -477,9 +477,6 @@ function App() {
       <h2 style={{ marginTop: 16 }}>
         Suma robocizny: {totalLabor.toFixed(2)} {currency}
       </h2>
-
-        Suma robocizny: {totalLabor.toFixed(2)} {currency}
-      </h2>
       <h2>
         Suma materiałów:{" "}
         {materialsBy === "contractor"
@@ -505,8 +502,5 @@ function App() {
         Szacowany czas pracy przy {workers} pracownikach:{" "}
         {hoursWithWorkers.toFixed(1)} godz.
       </p>
-    </div>
-  );
-}
 
 export default App;
