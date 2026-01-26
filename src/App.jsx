@@ -100,4 +100,107 @@ function App() {
                     style={{ width: "100%" }}
                     value={i.name}
                     onChange={(e) => {
-                      handleChange(idx, "na
+                      handleChange(idx, "name", e.target.value);
+                      setOpenIndex(idx);
+                    }}
+                    onFocus={() => setOpenIndex(idx)}
+                    onBlur={() => {
+                      setTimeout(() => setOpenIndex(null), 150);
+                    }}
+                    placeholder="Wpisz np. 'm' dla malowania"
+                  />
+                  {openIndex === idx && suggestions.length > 0 && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        right: 0,
+                        background: "#222",
+                        border: "1px solid #555",
+                        zIndex: 10,
+                        maxHeight: 150,
+                        overflowY: "auto",
+                      }}
+                    >
+                      {suggestions.map((s) => (
+                        <div
+                          key={s.name}
+                          style={{ padding: "4px 8px", cursor: "pointer" }}
+                          onMouseDown={() => {
+                            pickService(idx, s);
+                            setOpenIndex(null);
+                          }}
+                        >
+                          {s.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  <input
+                    style={{ width: "70px", textAlign: "right" }}
+                    type="number"
+                    value={i.qty}
+                    onChange={(e) => handleChange(idx, "qty", e.target.value)}
+                  />
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  <input
+                    style={{ width: "60px", textAlign: "center" }}
+                    value={i.unit}
+                    onChange={(e) => handleChange(idx, "unit", e.target.value)}
+                  />
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  <input
+                    style={{ width: "90px", textAlign: "right" }}
+                    type="number"
+                    value={i.price}
+                    onChange={(e) => handleChange(idx, "price", e.target.value)}
+                  />
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  <input
+                    style={{ width: "80px", textAlign: "right" }}
+                    type="number"
+                    value={i.rhPerUnit}
+                    onChange={(e) => handleChange(idx, "rhPerUnit", e.target.value)}
+                  />
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  {(i.qty * i.price).toFixed(2)} zł
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      <button
+        onClick={addItem}
+        disabled={items.length >= maxItems}
+        style={{
+          marginTop: 16,
+          padding: "8px 16px",
+          background: items.length >= maxItems ? "#444" : "#0f766e",
+          color: "#fff",
+          border: "none",
+          borderRadius: 4,
+          cursor: items.length >= maxItems ? "not-allowed" : "pointer",
+        }}
+      >
+        Dodaj pozycję
+      </button>
+
+      <h2 style={{ marginTop: 16 }}>Suma: {totalValue.toFixed(2)} zł</h2>
+      <p>Łącznie roboczogodzin (RH): {totalRH.toFixed(2)}</p>
+      <p>
+        Szacowany czas pracy przy {workers} pracownikach:{" "}
+        {hoursWithWorkers.toFixed(1)} godz.
+      </p>
+    </div>
+  );
+}
+
+export default App;
