@@ -441,53 +441,37 @@ function App() {
       </table>
 
       <button
-        onClick={addItem}
-        disabled={items.length >= maxItems}
-        style={{
-          marginTop: 16,
-          padding: "8px 16px",
-          background:
-            items.length >= maxItems ? "#444" : "#0f766e",
-          color: "#fff",
-          border: "none",
-          borderRadius: 4,
-          cursor:
-            items.length >= maxItems ? "not-allowed" : "pointer",
-        }}
-      >
-        Dodaj pozycję
-           <button
-        onClick={addItem}
-        disabled={items.length >= maxItems}
-        style={{
-          marginTop: 16,
-          padding: "8px 16px",
-          background:
-            items.length >= maxItems ? "#444" : "#0f766e",
-          color: "#fff",
-          border: "none",
-          borderRadius: 4,
-          cursor:
-            items.length >= maxItems ? "not-allowed" : "pointer",
-        }}
-      >
-        Dodaj pozycję
+  onClick={addItem}
+  disabled={items.length >= maxItems}
+  style={{
+    marginTop: 16,
+    padding: "8px 16px",
+    background: items.length >= maxItems ? "#444" : "#0f766e",
+    color: "#fff",
+    border: "none",
+    borderRadius: 4,
+    cursor: items.length >= maxItems ? "not-allowed" : "pointer",
+  }}
+>
+  Dodaj pozycję
+</button>
 
-      <button
-        onClick={handleDownloadPdf}
-        style={{
-          marginTop: 16,
-          marginLeft: 12,
-          padding: "8px 16px",
-          background: "#1d4ed8",
-          color: "#fff",
-          border: "none",
-          borderRadius: 4,
-          cursor: "pointer",
-        }}
-      >
-        Pobierz PDF (demo)
-      </button>
+<button
+  onClick={handleDownloadPdf}
+  style={{
+    marginTop: 16,
+    marginLeft: 12,
+    padding: "8px 16px",
+    background: "#1d4ed8",
+    color: "#fff",
+    border: "none",
+    borderRadius: 4,
+    cursor: "pointer",
+  }}
+>
+  Pobierz PDF (demo)
+</button>
+
 
       <h2 style={{ marginTop: 16 }}>
         Suma robocizny: {totalLabor.toFixed(2)} {currency}
