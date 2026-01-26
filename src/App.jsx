@@ -440,7 +440,7 @@ function App() {
         </tbody>
       </table>
 
-      <button
+            <button
         onClick={addItem}
         disabled={items.length >= maxItems}
         style={{
@@ -457,10 +457,6 @@ function App() {
       >
         Dodaj pozycję
       </button>
-      <button
-        onClick={addItem}
-        ...
-      >
 
       <button
         onClick={handleDownloadPdf}
@@ -479,6 +475,9 @@ function App() {
       </button>
 
       <h2 style={{ marginTop: 16 }}>
+        Suma robocizny: {totalLabor.toFixed(2)} {currency}
+      </h2>
+
         Suma robocizny: {totalLabor.toFixed(2)} {currency}
       </h2>
       <h2>
