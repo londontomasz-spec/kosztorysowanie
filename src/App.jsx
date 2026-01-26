@@ -192,6 +192,9 @@ function App() {
     }
     setItems(newItems);
   };
+  const handleDownloadPdf = () => {
+    alert("Tu będzie generowanie PDF (następny krok).");
+  };
 
   return (
     <div
@@ -453,6 +456,28 @@ function App() {
         }}
       >
         Dodaj pozycję
+      </button>
+      <button
+        onClick={addItem}
+        ...
+      >
+        Dodaj pozycję
+      </button>
+
+      <button
+        onClick={handleDownloadPdf}
+        style={{
+          marginTop: 16,
+          marginLeft: 12,
+          padding: "8px 16px",
+          background: "#1d4ed8",
+          color: "#fff",
+          border: "none",
+          borderRadius: 4,
+          cursor: "pointer",
+        }}
+      >
+        Pobierz PDF (demo)
       </button>
 
       <h2 style={{ marginTop: 16 }}>
