@@ -4,8 +4,14 @@ const SERVICES = [
   { name: "Malowanie ścian 1x (biała)", rhPerUnit: 0.15 },
   { name: "Malowanie ścian 2x (biała)", rhPerUnit: 0.25 },
   { name: "Malowanie ścian 1x (kolor)", rhPerUnit: 0.18 },
-  { name: "Malowanie sufitów farbą białą", rhPerUnit: 0.22 },
-  { name: "Gładź gipsowa na ścianach", rhPerUnit: 0.3 },
+  { name: "Malowanie sufitów", rhPerUnit: 0.2 },
+  { name: "Gładź gipsowa ścian", rhPerUnit: 0.3 },
+  { name: "Gładź gipsowa sufitów", rhPerUnit: 0.35 },
+  { name: "Układanie paneli podłogowych", rhPerUnit: 0.25 },
+  { name: "Układanie płytek ściennych w łazience", rhPerUnit: 0.5 },
+  { name: "Układanie płytek podłogowych w łazience", rhPerUnit: 0.5 },
+  { name: "Gruntowanie ścian", rhPerUnit: 0.1 },
+  { name: "Gruntowanie sufitów", rhPerUnit: 0.1 },
 ];
 
 function App() {
@@ -19,7 +25,7 @@ function App() {
       rhPerUnit: 0.25,
     },
     {
-      name: "Gładź gipsowa na ścianach",
+      name: "Gładź gipsowa ścian",
       unit: "m²",
       qty: 30,
       laborPrice: 45,
@@ -30,9 +36,7 @@ function App() {
 
   const [workers, setWorkers] = useState(1);
   const [openIndex, setOpenIndex] = useState(null);
-  const [materialsBy, setMaterialsBy] = useState("contractor");
-  const [vatRate, setVatRate] = useState(23);
-  const [currency, setCurrency] = useState("PLN");
+  const [materialsBy, setMaterialsBy] = useState("contractor"); // wykonawca / klient
   const maxItems = 3;
 
   const totalLabor = items.reduce(
@@ -48,11 +52,6 @@ function App() {
     0
   );
   const hoursWithWorkers = workers > 0 ? totalRH / workers : 0;
-
-  const totalForClient =
-    totalLabor + (materialsBy === "contractor" ? totalMaterials : 0);
-  const vatAmount = (totalForClient * vatRate) / 100;
-  const totalBrutto = totalForClient + vatAmount;
 
   const handleChange = (index, field, value) => {
     const newItems = [...items];
@@ -101,10 +100,6 @@ function App() {
     setItems(newItems);
   };
 
-  const handleDownloadPdf = () => {
-    alert("Tu będzie generowanie PDF (demo).");
-  };
-
   return (
     <div
       style={{
@@ -150,36 +145,6 @@ function App() {
             onChange={() => setMaterialsBy("client")}
           />{" "}
           klient
-        </label>
-      </div>
-
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ marginRight: 16 }}>
-          Stawka VAT (%):{" "}
-          <input
-            type="number"
-            min={0}
-            max={23}
-            value={vatRate}
-            onChange={(e) =>
-              setVatRate(Number(e.target.value) || 0)
-            }
-            style={{ width: 60, textAlign: "right" }}
-          />
-        </label>
-
-        <label>
-          Waluta:{" "}
-          <select
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            style={{ padding: "2px 6px" }}
-          >
-            <option value="PLN">PLN</option>
-            <option value="EUR">EUR</option>
-            <option value="USD">USD</option>
-            <option value="GBP">GBP</option>
-          </select>
         </label>
       </div>
 
@@ -367,46 +332,16 @@ function App() {
         Dodaj pozycję
       </button>
 
-      <button
-        onClick={handleDownloadPdf}
-        style={{
-          marginTop: 16,
-          marginLeft: 12,
-          padding: "8px 16px",
-          background: "#1d4ed8",
-          color: "#fff",
-          border: "none",
-          borderRadius: 4,
-          cursor: "pointer",
-        }}
-      >
-        Pobierz PDF (demo)
-      </button>
-
       <h2 style={{ marginTop: 16 }}>
-        Suma robocizny: {totalLabor.toFixed(2)} {currency}
+        Suma robocizny: {totalLabor.toFixed(2)} zł
       </h2>
       <h2>
         Suma materiałów:{" "}
         {materialsBy === "contractor"
-          ? `${totalMaterials.toFixed(2)} ${currency} (po stronie wykonawcy)`
-          : `0 ${currency} (materiał klienta)`}
+          ? `${totalMaterials.toFixed(2)} zł (po stronie wykonawcy)`
+          : "0 zł (materiał klienta)"}
       </h2>
-
-      <h3 style={{ marginTop: 16 }}>Podsumowanie dla klienta:</h3>
-      <p>
-        Razem netto: {totalForClient.toFixed(2)} {currency}
-      </p>
-      <p>
-        VAT {vatRate}%: {vatAmount.toFixed(2)} {currency}
-      </p>
-      <p>
-        Razem brutto: {totalBrutto.toFixed(2)} {currency}
-      </p>
-
-      <p style={{ marginTop: 16 }}>
-        Łącznie roboczogodzin (RH): {totalRH.toFixed(2)}
-      </p>
+      <p>Łącznie roboczogodzin (RH): {totalRH.toFixed(2)}</p>
       <p>
         Szacowany czas pracy przy {workers} pracownikach:{" "}
         {hoursWithWorkers.toFixed(1)} godz.
