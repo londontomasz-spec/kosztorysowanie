@@ -192,6 +192,9 @@ function App() {
     }
     setItems(newItems);
   };
+  const handleDownloadPdf = () => {
+    alert("Tu będzie generowanie PDF (następny krok).");
+  };
 
   return (
     <div
@@ -453,6 +456,38 @@ function App() {
         }}
       >
         Dodaj pozycję
+           <button
+        onClick={addItem}
+        disabled={items.length >= maxItems}
+        style={{
+          marginTop: 16,
+          padding: "8px 16px",
+          background:
+            items.length >= maxItems ? "#444" : "#0f766e",
+          color: "#fff",
+          border: "none",
+          borderRadius: 4,
+          cursor:
+            items.length >= maxItems ? "not-allowed" : "pointer",
+        }}
+      >
+        Dodaj pozycję
+      </button>
+
+      <button
+        onClick={handleDownloadPdf}
+        style={{
+          marginTop: 16,
+          marginLeft: 12,
+          padding: "8px 16px",
+          background: "#1d4ed8",
+          color: "#fff",
+          border: "none",
+          borderRadius: 4,
+          cursor: "pointer",
+        }}
+      >
+        Pobierz PDF (demo)
       </button>
 
       <h2 style={{ marginTop: 16 }}>
@@ -483,6 +518,7 @@ function App() {
         Szacowany czas pracy przy {workers} pracownikach:{" "}
         {hoursWithWorkers.toFixed(1)} godz.
       </p>
+
     </div>
   );
 }
