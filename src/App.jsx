@@ -1,25 +1,7 @@
-import { useState } from "react";
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-
-// Poprawne przypisanie czcionek (kompatybilność z różnymi wersjami)
-if (pdfFonts && pdfFonts.pdfMake) {
-  pdfMake.vfs = pdfFonts.pdfMake.vfs;
-} else if (pdfFonts && pdfFonts.vfs) {
-  pdfMake.vfs = pdfFonts.vfs;
-} else if (typeof pdfFonts === "object") {
-  pdfMake.vfs = pdfFonts;
-}
-
-// Definicja czcionek - Roboto obsługuje polskie znaki
-pdfMake.fonts = {
-  Roboto: {
-    normal: "Roboto-Regular.ttf",
-    bold: "Roboto-Medium.ttf",
-    italics: "Roboto-Italic.ttf",
-    bolditalics: "Roboto-MediumItalic.ttf",
-  },
-};
+import { useEffect, useState } from "react";
+import { supabase } from "./lib/supabase";
+import Auth from "./components/Auth";
+import { jsPDF } from "jspdf";
 
 const SERVICES = [
   { name: "Malowanie ścian jednokrotne (farba biała)", rhPerUnit: 0.15 },
@@ -112,6 +94,52 @@ const SERVICES = [
 ];
 
 function App() {
+  // ===== AUTENTYKACJA SUPABASE =====
+  const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) {
+        fetchProfile(session.user.id);
+      } else {
+        setLoading(false);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) {
+        fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchProfile = async (userId) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (!error) setProfile(data);
+    setLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    setProfile(null);
+  };
+
+  // ===== LOGIKA KOSZTORYSU (BEZ ZMIAN) =====
   const [items, setItems] = useState([
     {
       name: "Malowanie ścian dwukrotne (farba biała)",
@@ -136,18 +164,16 @@ function App() {
   const [materialsBy, setMaterialsBy] = useState("contractor");
   const [vatRate, setVatRate] = useState(23);
   const [currency, setCurrency] = useState("PLN");
-  const maxItems = 3;
+  
+  // BRAMKA PREMIUM
+  const maxItems = profile?.is_premium ? 999 : 3;
 
   const totalLabor = items.reduce((sum, i) => sum + i.qty * i.laborPrice, 0);
-  const totalMaterials = items.reduce(
-    (sum, i) => sum + i.qty * i.materialPrice,
-    0
-  );
+  const totalMaterials = items.reduce((sum, i) => sum + i.qty * i.materialPrice, 0);
   const totalRH = items.reduce((sum, i) => sum + i.qty * (i.rhPerUnit || 0), 0);
   const hoursWithWorkers = workers > 0 ? totalRH / workers : 0;
 
-  const totalForClient =
-    totalLabor + (materialsBy === "contractor" ? totalMaterials : 0);
+  const totalForClient = totalLabor + (materialsBy === "contractor" ? totalMaterials : 0);
   const vatAmount = (totalForClient * vatRate) / 100;
   const totalBrutto = totalForClient + vatAmount;
 
@@ -165,14 +191,7 @@ function App() {
     if (items.length >= maxItems) return;
     setItems([
       ...items,
-      {
-        name: "",
-        unit: "m²",
-        qty: 0,
-        laborPrice: 0,
-        materialPrice: 0,
-        rhPerUnit: 0,
-      },
+      { name: "", unit: "m²", qty: 0, laborPrice: 0, materialPrice: 0, rhPerUnit: 0 },
     ]);
   };
 
@@ -183,10 +202,7 @@ function App() {
   const filteredServices = (text) => {
     if (!text) return [];
     const t = text.toLowerCase();
-    return SERVICES.filter((s) => s.name.toLowerCase().startsWith(t)).slice(
-      0,
-      5
-    );
+    return SERVICES.filter((s) => s.name.toLowerCase().startsWith(t)).slice(0, 5);
   };
 
   const pickService = (idx, service) => {
@@ -200,200 +216,69 @@ function App() {
   };
 
   const handleDownloadPdf = () => {
-    // Tabela z pozycjami
-    const tableBody = [
-      [
-        { text: "Lp.", style: "tableHeader" },
-        { text: "Nazwa usługi", style: "tableHeader" },
-        { text: "Ilość", style: "tableHeader" },
-        { text: "Jm.", style: "tableHeader" },
-        { text: "Cena/jm.", style: "tableHeader" },
-        { text: "Wartość", style: "tableHeader" },
-      ],
-      ...items.map((item, idx) => [
-        { text: (idx + 1).toString(), alignment: "center" },
-        { text: item.name },
-        { text: item.qty.toString(), alignment: "center" },
-        { text: item.unit, alignment: "center" },
-        { text: `${item.laborPrice.toFixed(2)} ${currency}`, alignment: "right" },
-        {
-          text: `${(item.qty * item.laborPrice).toFixed(2)} ${currency}`,
-          alignment: "right",
-        },
-      ]),
-    ];
+    const doc = new jsPDF();
 
-    const docDefinition = {
-      pageSize: "A4",
-      pageMargins: [40, 60, 40, 60],
+    doc.setFontSize(16);
+    doc.text("Kosztorys remontowy 2026", 20, 20);
 
-      // Domyślny styl z czcionką Roboto
-      defaultStyle: {
-        font: "Roboto",
-        fontSize: 10,
-      },
+    doc.setFontSize(10);
+    doc.text(`Waluta: ${currency}`, 20, 30);
+    doc.text(`VAT: ${vatRate}%`, 20, 35);
+    doc.text(`Liczba pracownikow: ${workers}`, 20, 40);
 
-      // Style
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10],
-        },
-        subheader: {
-          fontSize: 14,
-          bold: true,
-          margin: [0, 10, 0, 5],
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 10,
-          fillColor: "#2563eb",
-          color: "white",
-          alignment: "center",
-        },
-        totalLabel: {
-          fontSize: 11,
-          bold: true,
-        },
-        totalValue: {
-          fontSize: 11,
-          bold: true,
-          alignment: "right",
-        },
-      },
+    let y = 50;
+    doc.setFontSize(12);
+    doc.text("Pozycje:", 20, y);
+    y += 7;
 
-      content: [
-        // Nagłówek
-        { text: "KOSZTORYS REMONTOWY", style: "header", alignment: "center" },
-        {
-          text: `Data: ${new Date().toLocaleDateString("pl-PL")}`,
-          alignment: "right",
-          margin: [0, 0, 0, 20],
-        },
+    items.forEach((item, idx) => {
+      const line = `${idx + 1}. ${item.name} - ${item.qty} ${item.unit} x ${item.laborPrice} ${currency} = ${(item.qty * item.laborPrice).toFixed(2)} ${currency}`;
+      doc.setFontSize(9);
+      doc.text(line, 20, y);
+      y += 6;
+    });
 
-        // Informacje ogólne
-        {
-          columns: [
-            { text: `Waluta: ${currency}`, width: "auto" },
-            { text: `Stawka VAT: ${vatRate}%`, width: "auto" },
-            { text: `Liczba pracowników: ${workers}`, width: "auto" },
-          ],
-          columnGap: 20,
-          margin: [0, 0, 0, 15],
-        },
+    y += 5;
+    doc.setFontSize(11);
+    doc.text(`Suma robocizny: ${totalLabor.toFixed(2)} ${currency}`, 20, y);
+    y += 6;
+    doc.text(
+      `Suma materialow: ${(materialsBy === "contractor" ? totalMaterials : 0).toFixed(2)} ${currency}`,
+      20,
+      y
+    );
+    y += 6;
+    doc.text(`Razem netto: ${totalForClient.toFixed(2)} ${currency}`, 20, y);
+    y += 6;
+    doc.text(`VAT ${vatRate}%: ${vatAmount.toFixed(2)} ${currency}`, 20, y);
+    y += 6;
+    doc.text(`Razem brutto: ${totalBrutto.toFixed(2)} ${currency}`, 20, y);
+    y += 10;
+    doc.text(`Laczne RH: ${totalRH.toFixed(2)} godz.`, 20, y);
 
-        // Tabela pozycji
-        { text: "Wykaz prac:", style: "subheader" },
-        {
-          table: {
-            headerRows: 1,
-            widths: [25, "*", 40, 30, 70, 80],
-            body: tableBody,
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => "#cccccc",
-            vLineColor: () => "#cccccc",
-            paddingLeft: () => 4,
-            paddingRight: () => 4,
-            paddingTop: () => 3,
-            paddingBottom: () => 3,
-          },
-        },
-
-        // Podsumowanie
-        { text: "", margin: [0, 20, 0, 0] },
-        {
-          table: {
-            widths: ["*", 120],
-            body: [
-              [
-                { text: "Suma robocizny (netto):", style: "totalLabel" },
-                {
-                  text: `${totalLabor.toFixed(2)} ${currency}`,
-                  style: "totalValue",
-                },
-              ],
-              [
-                {
-                  text: `Materiały (${materialsBy === "contractor" ? "wykonawca" : "klient"}):`,
-                  style: "totalLabel",
-                },
-                {
-                  text: `${(materialsBy === "contractor" ? totalMaterials : 0).toFixed(2)} ${currency}`,
-                  style: "totalValue",
-                },
-              ],
-              [
-                { text: "Razem netto:", style: "totalLabel" },
-                {
-                  text: `${totalForClient.toFixed(2)} ${currency}`,
-                  style: "totalValue",
-                },
-              ],
-              [
-                { text: `VAT ${vatRate}%:`, style: "totalLabel" },
-                {
-                  text: `${vatAmount.toFixed(2)} ${currency}`,
-                  style: "totalValue",
-                },
-              ],
-              [
-                {
-                  text: "RAZEM BRUTTO:",
-                  style: "totalLabel",
-                  fillColor: "#f0f9ff",
-                },
-                {
-                  text: `${totalBrutto.toFixed(2)} ${currency}`,
-                  style: "totalValue",
-                  fillColor: "#f0f9ff",
-                  bold: true,
-                  fontSize: 12,
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0,
-            hLineColor: () => "#cccccc",
-          },
-        },
-
-        // Informacje o czasie pracy
-        { text: "", margin: [0, 20, 0, 0] },
-        {
-          text: `Łącznie roboczogodzin (RH): ${totalRH.toFixed(2)} godz.`,
-          fontSize: 10,
-        },
-        {
-          text: `Szacowany czas pracy przy ${workers} pracownikach: ${hoursWithWorkers.toFixed(1)} godz.`,
-          fontSize: 10,
-        },
-
-        // Stopka
-        {
-          text: "\n\n___________________________\nPodpis wykonawcy",
-          fontSize: 9,
-          margin: [0, 40, 0, 0],
-        },
-      ],
-
-      // Stopka strony
-      footer: (currentPage, pageCount) => ({
-        text: `Strona ${currentPage} z ${pageCount}`,
-        alignment: "center",
-        fontSize: 8,
-        margin: [0, 20, 0, 0],
-      }),
-    };
-
-    pdfMake.createPdf(docDefinition).download("kosztorys-remontowy.pdf");
+    doc.save("kosztorys-demo.pdf");
   };
 
+  // ===== EKRANY =====
+  if (loading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        background: '#111', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        color: '#fff',
+        fontSize: 18
+      }}>
+        Ładowanie...
+      </div>
+    );
+  }
+
+  if (!session) return <Auth />;
+
+  // ===== GŁÓWNA APLIKACJA =====
   return (
     <div
       style={{
@@ -404,9 +289,35 @@ function App() {
         fontFamily: "sans-serif",
       }}
     >
-      <h1>Kosztorys remontowy 2026 – DEMO</h1>
-      <p>Maksymalnie {maxItems} pozycje w wersji demo.</p>
+      {/* HEADER Z INFORMACJĄ O UŻYTKOWNIKU */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap' }}>
+        <div>
+          <h1 style={{ margin: 0 }}>Kosztorys remontowy 2026</h1>
+          <p style={{ color: '#888', fontSize: 14, margin: '8px 0 0 0' }}>
+            {profile?.email} | 
+            {profile?.is_premium ? 
+              ' ✨ Premium (nielimitowane pozycje)' : 
+              ` 🆓 Demo (max ${maxItems} pozycje)`
+            }
+          </p>
+        </div>
+        <button
+          onClick={handleLogout}
+          style={{
+            padding: '8px 16px',
+            background: '#dc2626',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            height: 'fit-content'
+          }}
+        >
+          Wyloguj
+        </button>
+      </div>
 
+      {/* RESZTA APLIKACJI (BEZ ZMIAN) */}
       <div style={{ marginTop: 16, marginBottom: 16 }}>
         <label>
           Liczba pracowników:{" "}
@@ -414,9 +325,7 @@ function App() {
             type="number"
             min={1}
             value={workers}
-            onChange={(e) =>
-              setWorkers(Math.max(1, Number(e.target.value) || 1))
-            }
+            onChange={(e) => setWorkers(Math.max(1, Number(e.target.value) || 1))}
             style={{ width: 60, textAlign: "right" }}
           />
         </label>
@@ -469,14 +378,10 @@ function App() {
         </label>
       </div>
 
-      <table
-        style={{ width: "100%", marginTop: 8, borderCollapse: "collapse" }}
-      >
+      <table style={{ width: "100%", marginTop: 8, borderCollapse: "collapse" }}>
         <thead>
           <tr>
-            <th style={{ borderBottom: "1px solid #555", textAlign: "left" }}>
-              Pozycja
-            </th>
+            <th style={{ borderBottom: "1px solid #555", textAlign: "left" }}>Pozycja</th>
             <th style={{ borderBottom: "1px solid #555" }}>Ilość</th>
             <th style={{ borderBottom: "1px solid #555" }}>Jm</th>
             <th style={{ borderBottom: "1px solid #555" }}>Cena robocizny</th>
@@ -551,9 +456,7 @@ function App() {
                     step="0.01"
                     min={0}
                     value={item.laborPrice}
-                    onChange={(e) =>
-                      handleChange(idx, "laborPrice", e.target.value)
-                    }
+                    onChange={(e) => handleChange(idx, "laborPrice", e.target.value)}
                   />
                 </td>
                 <td style={{ textAlign: "right" }}>
@@ -563,9 +466,7 @@ function App() {
                     step="0.01"
                     min={0}
                     value={item.materialPrice}
-                    onChange={(e) =>
-                      handleChange(idx, "materialPrice", e.target.value)
-                    }
+                    onChange={(e) => handleChange(idx, "materialPrice", e.target.value)}
                   />
                 </td>
                 <td style={{ textAlign: "right" }}>
@@ -575,9 +476,7 @@ function App() {
                     step="0.01"
                     min={0}
                     value={item.rhPerUnit}
-                    onChange={(e) =>
-                      handleChange(idx, "rhPerUnit", e.target.value)
-                    }
+                    onChange={(e) => handleChange(idx, "rhPerUnit", e.target.value)}
                   />
                 </td>
                 <td style={{ textAlign: "center" }}>
@@ -614,7 +513,7 @@ function App() {
             cursor: items.length >= maxItems ? "not-allowed" : "pointer",
           }}
         >
-          Dodaj pozycję
+          Dodaj pozycję {!profile?.is_premium && `(${items.length}/${maxItems})`}
         </button>
 
         <button
@@ -629,7 +528,7 @@ function App() {
             cursor: "pointer",
           }}
         >
-          📄 Pobierz PDF
+          Pobierz PDF
         </button>
       </div>
 
@@ -644,22 +543,13 @@ function App() {
       </h2>
 
       <h3 style={{ marginTop: 16 }}>Podsumowanie dla klienta:</h3>
-      <p>
-        Razem netto: {totalForClient.toFixed(2)} {currency}
-      </p>
-      <p>
-        VAT {vatRate}%: {vatAmount.toFixed(2)} {currency}
-      </p>
-      <p>
-        Razem brutto: {totalBrutto.toFixed(2)} {currency}
-      </p>
+      <p>Razem netto: {totalForClient.toFixed(2)} {currency}</p>
+      <p>VAT {vatRate}%: {vatAmount.toFixed(2)} {currency}</p>
+      <p>Razem brutto: {totalBrutto.toFixed(2)} {currency}</p>
 
-      <p style={{ marginTop: 16 }}>
-        Łącznie roboczogodzin (RH): {totalRH.toFixed(2)}
-      </p>
+      <p style={{ marginTop: 16 }}>Łącznie roboczogodzin (RH): {totalRH.toFixed(2)}</p>
       <p>
-        Szacowany czas pracy przy {workers} pracownikach:{" "}
-        {hoursWithWorkers.toFixed(1)} godz.
+        Szacowany czas pracy przy {workers} pracownikach: {hoursWithWorkers.toFixed(1)} godz.
       </p>
     </div>
   );
