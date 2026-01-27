@@ -166,48 +166,48 @@ function App() {
   };
 
   const handleDownloadPdf = () => {
-    const doc = new jsPDF();
+  const doc = new jsPDF();
 
-    doc.setFontSize(16);
-    doc.text("Kosztorys remontowy 2026", 20, 20);
+  // Użyj wbudowanej czcionki z obsługą Unicode
+  doc.setFont("helvetica");
 
-    doc.setFontSize(10);
-    doc.text(`Waluta: ${currency}`, 20, 30);
-    doc.text(`VAT: ${vatRate}%`, 20, 35);
-    doc.text(`Liczba pracownikow: ${workers}`, 20, 40);
+  doc.setFontSize(16);
+  doc.text("Kosztorys remontowy 2026", 20, 20);
 
-    let y = 50;
-    doc.setFontSize(12);
-    doc.text("Pozycje:", 20, y);
-    y += 7;
+  doc.setFontSize(10);
+  doc.text("Waluta: " + currency, 20, 30);
+  doc.text("VAT: " + vatRate + "%", 20, 35);
+  doc.text("Liczba pracownikow: " + workers, 20, 40);
 
-    items.forEach((item, idx) => {
-      const line = `${idx + 1}. ${item.name} - ${item.qty} ${item.unit} x ${item.laborPrice} ${currency} = ${(item.qty * item.laborPrice).toFixed(2)} ${currency}`;
-      doc.setFontSize(9);
-      doc.text(line, 20, y);
-      y += 6;
-    });
+  let y = 50;
+  doc.setFontSize(12);
+  doc.text("Pozycje:", 20, y);
+  y += 7;
 
-    y += 5;
-    doc.setFontSize(11);
-    doc.text(`Suma robocizny: ${totalLabor.toFixed(2)} ${currency}`, 20, y);
+  items.forEach((item, idx) => {
+    const line = (idx + 1) + ". " + item.name + " - " + item.qty + " " + item.unit + " x " + item.laborPrice + " " + currency + " = " + (item.qty * item.laborPrice).toFixed(2) + " " + currency;
+    doc.setFontSize(9);
+    doc.text(line, 20, y);
     y += 6;
-    doc.text(
-      `Suma materialow: ${(materialsBy === "contractor" ? totalMaterials : 0).toFixed(2)} ${currency}`,
-      20,
-      y
-    );
-    y += 6;
-    doc.text(`Razem netto: ${totalForClient.toFixed(2)} ${currency}`, 20, y);
-    y += 6;
-    doc.text(`VAT ${vatRate}%: ${vatAmount.toFixed(2)} ${currency}`, 20, y);
-    y += 6;
-    doc.text(`Razem brutto: ${totalBrutto.toFixed(2)} ${currency}`, 20, y);
-    y += 10;
-    doc.text(`Laczne RH: ${totalRH.toFixed(2)} godz.`, 20, y);
+  });
 
-    doc.save("kosztorys-demo.pdf");
-  };
+  y += 5;
+  doc.setFontSize(11);
+  doc.text("Suma robocizny: " + totalLabor.toFixed(2) + " " + currency, 20, y);
+  y += 6;
+  doc.text("Suma materialow: " + (materialsBy === "contractor" ? totalMaterials : 0).toFixed(2) + " " + currency, 20, y);
+  y += 6;
+  doc.text("Razem netto: " + totalForClient.toFixed(2) + " " + currency, 20, y);
+  y += 6;
+  doc.text("VAT " + vatRate + "%: " + vatAmount.toFixed(2) + " " + currency, 20, y);
+  y += 6;
+  doc.text("Razem brutto: " + totalBrutto.toFixed(2) + " " + currency, 20, y);
+  y += 10;
+  doc.text("Laczne RH: " + totalRH.toFixed(2) + " godz.", 20, y);
+
+  doc.save("kosztorys-demo.pdf");
+};
+
 
   return (
     <div
