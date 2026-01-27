@@ -2,7 +2,24 @@ import { useState } from "react";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// Poprawne przypisanie czcionek (kompatybilność z różnymi wersjami)
+if (pdfFonts && pdfFonts.pdfMake) {
+  pdfMake.vfs = pdfFonts.pdfMake.vfs;
+} else if (pdfFonts && pdfFonts.vfs) {
+  pdfMake.vfs = pdfFonts.vfs;
+} else if (typeof pdfFonts === "object") {
+  pdfMake.vfs = pdfFonts;
+}
+
+// Definicja czcionek - Roboto obsługuje polskie znaki
+pdfMake.fonts = {
+  Roboto: {
+    normal: "Roboto-Regular.ttf",
+    bold: "Roboto-Medium.ttf",
+    italics: "Roboto-Italic.ttf",
+    bolditalics: "Roboto-MediumItalic.ttf",
+  },
+};
 
 const SERVICES = [
   { name: "Malowanie ścian jednokrotne (farba biała)", rhPerUnit: 0.15 },
@@ -122,11 +139,15 @@ function App() {
   const maxItems = 3;
 
   const totalLabor = items.reduce((sum, i) => sum + i.qty * i.laborPrice, 0);
-  const totalMaterials = items.reduce((sum, i) => sum + i.qty * i.materialPrice, 0);
+  const totalMaterials = items.reduce(
+    (sum, i) => sum + i.qty * i.materialPrice,
+    0
+  );
   const totalRH = items.reduce((sum, i) => sum + i.qty * (i.rhPerUnit || 0), 0);
   const hoursWithWorkers = workers > 0 ? totalRH / workers : 0;
 
-  const totalForClient = totalLabor + (materialsBy === "contractor" ? totalMaterials : 0);
+  const totalForClient =
+    totalLabor + (materialsBy === "contractor" ? totalMaterials : 0);
   const vatAmount = (totalForClient * vatRate) / 100;
   const totalBrutto = totalForClient + vatAmount;
 
@@ -144,7 +165,14 @@ function App() {
     if (items.length >= maxItems) return;
     setItems([
       ...items,
-      { name: "", unit: "m²", qty: 0, laborPrice: 0, materialPrice: 0, rhPerUnit: 0 },
+      {
+        name: "",
+        unit: "m²",
+        qty: 0,
+        laborPrice: 0,
+        materialPrice: 0,
+        rhPerUnit: 0,
+      },
     ]);
   };
 
@@ -155,7 +183,10 @@ function App() {
   const filteredServices = (text) => {
     if (!text) return [];
     const t = text.toLowerCase();
-    return SERVICES.filter((s) => s.name.toLowerCase().startsWith(t)).slice(0, 5);
+    return SERVICES.filter((s) => s.name.toLowerCase().startsWith(t)).slice(
+      0,
+      5
+    );
   };
 
   const pickService = (idx, service) => {
@@ -169,30 +200,198 @@ function App() {
   };
 
   const handleDownloadPdf = () => {
-    const itemsContent = items.map((item, idx) => ({
-      text: `${idx + 1}. ${item.name} - ${item.qty} ${item.unit} x ${item.laborPrice} ${currency} = ${(item.qty * item.laborPrice).toFixed(2)} ${currency}`,
-      fontSize: 10,
-      margin: [0, 2],
-    }));
+    // Tabela z pozycjami
+    const tableBody = [
+      [
+        { text: "Lp.", style: "tableHeader" },
+        { text: "Nazwa usługi", style: "tableHeader" },
+        { text: "Ilość", style: "tableHeader" },
+        { text: "Jm.", style: "tableHeader" },
+        { text: "Cena/jm.", style: "tableHeader" },
+        { text: "Wartość", style: "tableHeader" },
+      ],
+      ...items.map((item, idx) => [
+        { text: (idx + 1).toString(), alignment: "center" },
+        { text: item.name },
+        { text: item.qty.toString(), alignment: "center" },
+        { text: item.unit, alignment: "center" },
+        { text: `${item.laborPrice.toFixed(2)} ${currency}`, alignment: "right" },
+        {
+          text: `${(item.qty * item.laborPrice).toFixed(2)} ${currency}`,
+          alignment: "right",
+        },
+      ]),
+    ];
 
     const docDefinition = {
+      pageSize: "A4",
+      pageMargins: [40, 60, 40, 60],
+
+      // Domyślny styl z czcionką Roboto
+      defaultStyle: {
+        font: "Roboto",
+        fontSize: 10,
+      },
+
+      // Style
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 10],
+        },
+        subheader: {
+          fontSize: 14,
+          bold: true,
+          margin: [0, 10, 0, 5],
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 10,
+          fillColor: "#2563eb",
+          color: "white",
+          alignment: "center",
+        },
+        totalLabel: {
+          fontSize: 11,
+          bold: true,
+        },
+        totalValue: {
+          fontSize: 11,
+          bold: true,
+          alignment: "right",
+        },
+      },
+
       content: [
-        { text: "Kosztorys remontowy 2026", fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
-        { text: `Waluta: ${currency}`, fontSize: 11 },
-        { text: `VAT: ${vatRate}%`, fontSize: 11 },
-        { text: `Liczba pracowników: ${workers}`, fontSize: 11, margin: [0, 0, 0, 10] },
-        { text: "Pozycje:", fontSize: 13, bold: true, margin: [0, 10, 0, 5] },
-        ...itemsContent,
-        { text: `\nSuma robocizny: ${totalLabor.toFixed(2)} ${currency}`, fontSize: 12, margin: [0, 10, 0, 2] },
-        { text: `Suma materiałów: ${(materialsBy === "contractor" ? totalMaterials : 0).toFixed(2)} ${currency}`, fontSize: 12, margin: [0, 2] },
-        { text: `Razem netto: ${totalForClient.toFixed(2)} ${currency}`, fontSize: 12, margin: [0, 2] },
-        { text: `VAT ${vatRate}%: ${vatAmount.toFixed(2)} ${currency}`, fontSize: 12, margin: [0, 2] },
-        { text: `Razem brutto: ${totalBrutto.toFixed(2)} ${currency}`, fontSize: 12, bold: true, margin: [0, 2] },
-        { text: `\nŁącznie RH: ${totalRH.toFixed(2)} godz.`, fontSize: 11, margin: [0, 10, 0, 0] },
+        // Nagłówek
+        { text: "KOSZTORYS REMONTOWY", style: "header", alignment: "center" },
+        {
+          text: `Data: ${new Date().toLocaleDateString("pl-PL")}`,
+          alignment: "right",
+          margin: [0, 0, 0, 20],
+        },
+
+        // Informacje ogólne
+        {
+          columns: [
+            { text: `Waluta: ${currency}`, width: "auto" },
+            { text: `Stawka VAT: ${vatRate}%`, width: "auto" },
+            { text: `Liczba pracowników: ${workers}`, width: "auto" },
+          ],
+          columnGap: 20,
+          margin: [0, 0, 0, 15],
+        },
+
+        // Tabela pozycji
+        { text: "Wykaz prac:", style: "subheader" },
+        {
+          table: {
+            headerRows: 1,
+            widths: [25, "*", 40, 30, 70, 80],
+            body: tableBody,
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => "#cccccc",
+            vLineColor: () => "#cccccc",
+            paddingLeft: () => 4,
+            paddingRight: () => 4,
+            paddingTop: () => 3,
+            paddingBottom: () => 3,
+          },
+        },
+
+        // Podsumowanie
+        { text: "", margin: [0, 20, 0, 0] },
+        {
+          table: {
+            widths: ["*", 120],
+            body: [
+              [
+                { text: "Suma robocizny (netto):", style: "totalLabel" },
+                {
+                  text: `${totalLabor.toFixed(2)} ${currency}`,
+                  style: "totalValue",
+                },
+              ],
+              [
+                {
+                  text: `Materiały (${materialsBy === "contractor" ? "wykonawca" : "klient"}):`,
+                  style: "totalLabel",
+                },
+                {
+                  text: `${(materialsBy === "contractor" ? totalMaterials : 0).toFixed(2)} ${currency}`,
+                  style: "totalValue",
+                },
+              ],
+              [
+                { text: "Razem netto:", style: "totalLabel" },
+                {
+                  text: `${totalForClient.toFixed(2)} ${currency}`,
+                  style: "totalValue",
+                },
+              ],
+              [
+                { text: `VAT ${vatRate}%:`, style: "totalLabel" },
+                {
+                  text: `${vatAmount.toFixed(2)} ${currency}`,
+                  style: "totalValue",
+                },
+              ],
+              [
+                {
+                  text: "RAZEM BRUTTO:",
+                  style: "totalLabel",
+                  fillColor: "#f0f9ff",
+                },
+                {
+                  text: `${totalBrutto.toFixed(2)} ${currency}`,
+                  style: "totalValue",
+                  fillColor: "#f0f9ff",
+                  bold: true,
+                  fontSize: 12,
+                },
+              ],
+            ],
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0,
+            hLineColor: () => "#cccccc",
+          },
+        },
+
+        // Informacje o czasie pracy
+        { text: "", margin: [0, 20, 0, 0] },
+        {
+          text: `Łącznie roboczogodzin (RH): ${totalRH.toFixed(2)} godz.`,
+          fontSize: 10,
+        },
+        {
+          text: `Szacowany czas pracy przy ${workers} pracownikach: ${hoursWithWorkers.toFixed(1)} godz.`,
+          fontSize: 10,
+        },
+
+        // Stopka
+        {
+          text: "\n\n___________________________\nPodpis wykonawcy",
+          fontSize: 9,
+          margin: [0, 40, 0, 0],
+        },
       ],
+
+      // Stopka strony
+      footer: (currentPage, pageCount) => ({
+        text: `Strona ${currentPage} z ${pageCount}`,
+        alignment: "center",
+        fontSize: 8,
+        margin: [0, 20, 0, 0],
+      }),
     };
 
-    pdfMake.createPdf(docDefinition).download("kosztorys-demo.pdf");
+    pdfMake.createPdf(docDefinition).download("kosztorys-remontowy.pdf");
   };
 
   return (
@@ -215,7 +414,9 @@ function App() {
             type="number"
             min={1}
             value={workers}
-            onChange={(e) => setWorkers(Math.max(1, Number(e.target.value) || 1))}
+            onChange={(e) =>
+              setWorkers(Math.max(1, Number(e.target.value) || 1))
+            }
             style={{ width: 60, textAlign: "right" }}
           />
         </label>
@@ -268,10 +469,14 @@ function App() {
         </label>
       </div>
 
-      <table style={{ width: "100%", marginTop: 8, borderCollapse: "collapse" }}>
+      <table
+        style={{ width: "100%", marginTop: 8, borderCollapse: "collapse" }}
+      >
         <thead>
           <tr>
-            <th style={{ borderBottom: "1px solid #555", textAlign: "left" }}>Pozycja</th>
+            <th style={{ borderBottom: "1px solid #555", textAlign: "left" }}>
+              Pozycja
+            </th>
             <th style={{ borderBottom: "1px solid #555" }}>Ilość</th>
             <th style={{ borderBottom: "1px solid #555" }}>Jm</th>
             <th style={{ borderBottom: "1px solid #555" }}>Cena robocizny</th>
@@ -346,7 +551,9 @@ function App() {
                     step="0.01"
                     min={0}
                     value={item.laborPrice}
-                    onChange={(e) => handleChange(idx, "laborPrice", e.target.value)}
+                    onChange={(e) =>
+                      handleChange(idx, "laborPrice", e.target.value)
+                    }
                   />
                 </td>
                 <td style={{ textAlign: "right" }}>
@@ -356,7 +563,9 @@ function App() {
                     step="0.01"
                     min={0}
                     value={item.materialPrice}
-                    onChange={(e) => handleChange(idx, "materialPrice", e.target.value)}
+                    onChange={(e) =>
+                      handleChange(idx, "materialPrice", e.target.value)
+                    }
                   />
                 </td>
                 <td style={{ textAlign: "right" }}>
@@ -366,7 +575,9 @@ function App() {
                     step="0.01"
                     min={0}
                     value={item.rhPerUnit}
-                    onChange={(e) => handleChange(idx, "rhPerUnit", e.target.value)}
+                    onChange={(e) =>
+                      handleChange(idx, "rhPerUnit", e.target.value)
+                    }
                   />
                 </td>
                 <td style={{ textAlign: "center" }}>
@@ -418,7 +629,7 @@ function App() {
             cursor: "pointer",
           }}
         >
-          Pobierz PDF
+          📄 Pobierz PDF
         </button>
       </div>
 
@@ -433,13 +644,22 @@ function App() {
       </h2>
 
       <h3 style={{ marginTop: 16 }}>Podsumowanie dla klienta:</h3>
-      <p>Razem netto: {totalForClient.toFixed(2)} {currency}</p>
-      <p>VAT {vatRate}%: {vatAmount.toFixed(2)} {currency}</p>
-      <p>Razem brutto: {totalBrutto.toFixed(2)} {currency}</p>
-
-      <p style={{ marginTop: 16 }}>Łącznie roboczogodzin (RH): {totalRH.toFixed(2)}</p>
       <p>
-        Szacowany czas pracy przy {workers} pracownikach: {hoursWithWorkers.toFixed(1)} godz.
+        Razem netto: {totalForClient.toFixed(2)} {currency}
+      </p>
+      <p>
+        VAT {vatRate}%: {vatAmount.toFixed(2)} {currency}
+      </p>
+      <p>
+        Razem brutto: {totalBrutto.toFixed(2)} {currency}
+      </p>
+
+      <p style={{ marginTop: 16 }}>
+        Łącznie roboczogodzin (RH): {totalRH.toFixed(2)}
+      </p>
+      <p>
+        Szacowany czas pracy przy {workers} pracownikach:{" "}
+        {hoursWithWorkers.toFixed(1)} godz.
       </p>
     </div>
   );
