@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase";
 import Auth from "./components/Auth";
+import PremiumButton from "./components/PremiumButton"; // Upewnij się, że ten plik istnieje
 import { jsPDF } from "jspdf";
 
 const SERVICES = [
@@ -139,7 +140,7 @@ function App() {
     setProfile(null);
   };
 
-  // ===== LOGIKA KOSZTORYSU (BEZ ZMIAN) =====
+  // ===== LOGIKA KOSZTORYSU =====
   const [items, setItems] = useState([
     {
       name: "Malowanie ścian dwukrotne (farba biała)",
@@ -215,6 +216,7 @@ function App() {
     setOpenIndex(null);
   };
 
+  // NAPRAWIONA FUNKCJA PDF
   const handleDownloadPdf = () => {
     const doc = new jsPDF();
 
@@ -289,8 +291,8 @@ function App() {
         fontFamily: "sans-serif",
       }}
     >
-      {/* HEADER Z INFORMACJĄ O UŻYTKOWNIKU */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap' }}>
+      {/* HEADER Z LOGOUT I PREMIUM BUTTON */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h1 style={{ margin: 0 }}>Kosztorys remontowy 2026</h1>
           <p style={{ color: '#888', fontSize: 14, margin: '8px 0 0 0' }}>
@@ -301,23 +303,29 @@ function App() {
             }
           </p>
         </div>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: '8px 16px',
-            background: '#dc2626',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 4,
-            cursor: 'pointer',
-            height: 'fit-content'
-          }}
-        >
-          Wyloguj
-        </button>
+        
+        {/* Przyciski */}
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          {/* Przycisk Premium - pokaż tylko jeśli NIE jest premium */}
+          {!profile?.is_premium && <PremiumButton />}
+          
+          <button
+            onClick={handleLogout}
+            style={{
+              padding: '8px 16px',
+              background: '#dc2626',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 4,
+              cursor: 'pointer'
+            }}
+          >
+            Wyloguj
+          </button>
+        </div>
       </div>
 
-      {/* RESZTA APLIKACJI (BEZ ZMIAN) */}
+      {/* RESZTA APLIKACJI */}
       <div style={{ marginTop: 16, marginBottom: 16 }}>
         <label>
           Liczba pracowników:{" "}
