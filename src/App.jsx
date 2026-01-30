@@ -273,16 +273,27 @@ const maxItems = (session && profile?.is_premium) ? 999 : 3;
   const totalBrutto = totalForClient + vatAmount;
 
   // ========== EFEKTY (useEffect) ==========
-  useEffect(() => {
+    useEffect(() => {
+    // Sprawdź czy wróciliśmy z płatności
+    const query = new URLSearchParams(window.location.search);
+    if (query.get("success")) {
+      alert("Dziękujemy za zakup Premium! Twoje konto zostało zaktualizowane.");
+      // Czyścimy URL żeby nie wyświetlało się przy odświeżaniu
+      window.history.replaceState({}, document.title, "/");
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
+        // Tu jest klucz - wymuszamy pobranie profilu z bazy
         fetchProfile(session.user.id);
         loadSavedEstimates(session.user.id);
       } else {
         setLoading(false);
       }
     });
+
+    // ... reszta kodu authStateChange bez zmian
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
