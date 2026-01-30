@@ -645,18 +645,50 @@ const handleDownloadPdf = async () => {
 
   const pageWidth = doc.internal.pageSize.getWidth();
 
-  // Nagłówek - tytuł na środku
+    // Nagłówek - tytuł na środku
   doc.setFontSize(18);
   doc.setTextColor(15, 118, 110);
   doc.text("KOSZTORYS REMONTOWY", 105, 20, { align: "center" });
 
-  // Data i miejscowość w prawym górnym rogu
-  doc.setFontSize(10);
-  doc.setTextColor(100);
-  const locationDate = documentCity ? `${documentCity}, ${documentDate}` : documentDate;
-  doc.text(locationDate, pageWidth - 20, 20, { align: "right" });
-
-  let y = 35;
+  let y = 35; // Początkowa wysokość sekcji danych
+  
+  // Dane klienta
+  if (pdfOptions.includeClientData) {
+    // 1. DANE KLIENTA (LEWA STRONA)
+    doc.setFontSize(11);
+    doc.setTextColor(0);
+    
+    // Zapamiętujemy Y nagłówka, żeby wyrównać datę do tej samej linii
+    const headerY = y;
+    
+    doc.text("DANE KLIENTA:", 20, y);
+    
+    // 2. MIEJSCOWOŚĆ I DATA (PRAWA STRONA - ta sama wysokość co "DANE KLIENTA")
+    doc.setFontSize(10);
+    doc.setTextColor(100); // Szary kolor dla daty
+    const locationDate = documentCity ? `${documentCity}, ${documentDate}` : documentDate;
+    // pageWidth - 20 to margines prawy
+    doc.text(locationDate, pageWidth - 20, headerY, { align: "right" });
+    
+    // Reset koloru na czarny dla reszty danych klienta
+    doc.setTextColor(0);
+    doc.setFontSize(11);
+    
+    y += 6;
+    
+    if (clientName) { doc.text(`Nazwa: ${clientName}`, 20, y); y += 5; }
+    if (clientAddress) { doc.text(`Adres: ${clientAddress}`, 20, y); y += 5; }
+    if (clientPhone) { doc.text(`Telefon: ${clientPhone}`, 20, y); y += 5; }
+    if (clientEmail) { doc.text(`Email: ${clientEmail}`, 20, y); y += 5; }
+    y += 5;
+  } else {
+    // Jeśli nie ma danych klienta, to data i tak powinna się gdzieś pokazać
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    const locationDate = documentCity ? `${documentCity}, ${documentDate}` : documentDate;
+    doc.text(locationDate, pageWidth - 20, y, { align: "right" });
+    y += 10;
+  }
   
   // Dane klienta
   if (pdfOptions.includeClientData && (clientName || clientAddress || clientPhone || clientEmail)) {
