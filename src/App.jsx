@@ -959,7 +959,12 @@ const handleDownloadPdf = async () => {
     <button onClick={() => setIsDarkMode(!isDarkMode)} style={{ padding: '8px 16px', background: theme.bgSecondary, color: theme.text, border: `1px solid ${theme.border}`, borderRadius: 4, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, transition: 'all 0.3s' }}>
       {isDarkMode ? '☀️ Jasny' : '🌙 Ciemny'}
     </button>
-    {(!session || !profile?.is_premium) && <PremiumButton />}
+       {(!session || !profile?.is_premium) && (
+      <PremiumButton 
+        userId={session?.user?.id} 
+        userEmail={session?.user?.email || profile?.email} 
+      />
+    )}
     {session && (
       <button onClick={handleLogout} style={{ padding: '8px 16px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}>
         Wyloguj
