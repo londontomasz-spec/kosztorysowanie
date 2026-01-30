@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-// Wyłączamy domyślne parsowanie body przez Vercel, bo Stripe wymaga surowego strumienia
+// Wyłączamy domyślne parsowanie body przez Vercel
 export const config = {
   api: {
     bodyParser: false,
@@ -31,36 +31,50 @@ export default async function handler(req, res) {
   let event;
 
   try {
-    if (!sig || !webhookSecret) return res.status(400).send('Missing signature or secret');
+    if (!sig || !webhookSecret) {
+      console.error('Brak podpisu lub sekretu webhooka');
+      return res.status(400).send('Missing signature or secret');
+    }
     event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
   } catch (err) {
-    console.error(`Webhook Error: ${err.message}`);
+    console.error(`Błąd weryfikacji webhooka: ${err.message}`);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // Jeśli płatność udana
+  // Logowanie typu zdarzenia
+  console.log('Otrzymano zdarzenie:', event.type);
+
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     const userId = session.metadata.userId;
+    
+    console.log('Webhook przetwarza userId:', userId);
 
     if (userId) {
+      // Inicjalizacja Supabase
       const supabase = createClient(
         process.env.VITE_SUPABASE_URL,
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
 
-      const { error } = await supabase
+      // Aktualizacja bazy
+      const { data, error } = await supabase
         .from('profiles')
         .update({ 
           is_premium: true,
           stripe_customer_id: session.customer
         })
-        .eq('id', userId);
+        .eq('id', userId)
+        .select();
 
       if (error) {
-        console.error('Supabase error:', error);
+        console.error('Błąd Supabase:', error);
         return res.status(500).send('Database Error');
       }
+      
+      console.log('Sukces! Zaktualizowano profil:', data);
+    } else {
+      console.error('BŁĄD: Brak userId w metadanych sesji!');
     }
   }
 
