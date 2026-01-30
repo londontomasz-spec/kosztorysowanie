@@ -65,7 +65,7 @@ priceId: 'price_1SuGxAKVfmca1FhPAq8krAPQ'
         e.target.style.transform = 'translateY(0)';
       }}
     >
-      {loading ? '⏳ Przekierowywanie...' : '✨ Kup Premium za 49 PLN'}
+      {loading ? '⏳ Przekierowywanie...' : ' Kup Premium za 49 PLN'}
     </button>
   );
 }
