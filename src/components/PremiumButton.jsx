@@ -1,71 +1,75 @@
-import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+aplikacja próbuje połączyć się z Supabase Edge Functions (chmura Supabase), a my skonfigurowaliśmy Vercel Serverless Functions (folder /api w Twoim projekcie). To są dwa różne systemy.
 
-export default function PremiumButton() {
+Prawdopodobnie w pliku PremiumButton.jsx używasz funkcji supabase.functions.invoke(). To błąd w tym przypadku, bo logika płatności (ten plik create-checkout-session.js) leży na Vercel, a nie w Supabase.
+
+Musimy to zmienić na zwykły fetch.
+
+Jak to naprawić? (Krok po kroku)
+1. Otwórz plik src/components/PremiumButton.jsx
+Zastąp całą jego zawartość poniższym kodem. Ten kod "uderza" do Twojego folderu /api na Vercel, zamiast szukać funkcji w Supabase.
+
+JavaScript
+
+import { useState } from 'react';
+
+export default function PremiumButton({ userId, userEmail }) {
   const [loading, setLoading] = useState(false);
 
-  const handlePurchase = async () => {
+  const handleBuyPremium = async () => {
     setLoading(true);
-
+    
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        alert('Musisz być zalogowany!');
-        setLoading(false);
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { 
-          email: user.email,
-priceId: 'price_1SuGxAKVfmca1FhPAq8krAPQ'
-        }
+      // WAŻNE: Tu zmieniamy adres na endpoint Vercel (/api/...)
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userId,
+          userEmail: userEmail,
+        }),
       });
 
-      if (error) {
-        console.error('Supabase function error:', error);
-        throw error;
-      }
-
-      if (!data?.url) {
-        throw new Error('Brak URL w odpowiedzi');
-      }
-
-      // Przekieruj na Stripe Checkout (NOWA METODA)
-      window.location.href = data.url;
+      const data = await response.json();
       
-    } catch (err) {
-      console.error('Error:', err);
-      alert('Błąd: ' + err.message);
+      if (!response.ok) {
+        throw new Error(data.error || 'Wystąpił błąd podczas tworzenia płatności');
+      }
+
+      if (data.url) {
+        // Przekieruj do Stripe
+        window.location.href = data.url;
+      } else {
+        throw new Error('Brak URL płatności w odpowiedzi');
+      }
+
+    } catch (error) {
+      console.error('Błąd płatności:', error);
+      alert('Błąd: ' + error.message);
+    } finally {
       setLoading(false);
     }
   };
 
   return (
     <button
-      onClick={handlePurchase}
+      onClick={handleBuyPremium}
       disabled={loading}
       style={{
-        padding: '12px 24px',
-        background: loading ? '#666' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        padding: '8px 16px',
+        background: loading ? '#666' : '#7c3aed', // Fioletowy kolor Stripe
         color: '#fff',
         border: 'none',
-        borderRadius: 8,
-        fontSize: 16,
-        fontWeight: 600,
+        borderRadius: 4,
         cursor: loading ? 'not-allowed' : 'pointer',
-        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-        transition: 'all 0.3s ease',
-      }}
-      onMouseEnter={(e) => {
-        if (!loading) e.target.style.transform = 'translateY(-2px)';
-      }}
-      onMouseLeave={(e) => {
-        e.target.style.transform = 'translateY(0)';
+        fontWeight: 'bold',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px'
       }}
     >
-      {loading ? '⏳ Przekierowywanie...' : ' Kup Premium za 49 PLN'}
+      {loading ? 'Przetwarzanie...' : 'Kup Premium'}
     </button>
   );
 }
