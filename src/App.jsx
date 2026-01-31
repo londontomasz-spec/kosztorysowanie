@@ -222,7 +222,7 @@ function App() {
   const [clientPhone, setClientPhone] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [documentCity, setDocumentCity] = useState("");
-const [documentDate, setDocumentDate] = useState(formatPolishDate(new Date()));
+  const [documentDate, setDocumentDate] = useState(new Date().toISOString().split('T')[0]);
 const [validityMonths, setValidityMonths] = useState(3);
 
 const [items, setItems] = useState([]);
