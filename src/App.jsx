@@ -716,8 +716,8 @@ function App() {
     if (materialsBy === 'contractor' && pdfOptions.includeMaterialPrices) {
       const missingMaterials = items.filter(item => !item.materialPricePerUnit || item.materialPricePerUnit === 0);
       if (missingMaterials.length > 0) {
-        alert(`❌ BŁĄD GENEROWANIA PDF\n\nWybrano opcję: "Materiał opłaca: Wykonawca", ale ${missingMaterials.length} pozycji nie ma wpisanej ceny materiału.\n\nUzupełnij ceny materiałów lub zmień płatnika na "Klient", aby wygenerować dokument.`);
-        return;
+        const proceed = window.confirm(`⚠️ OSTRZEŻENIE: BRAKUJĄCE CENY MATERIAŁÓW\n\nWybrano opcję: "Materiał opłaca: Wykonawca", ale ${missingMaterials.length} pozycji nie ma wpisanej ceny materiału.\n\nCzy mimo to chcesz wygenerować PDF? (Brakujące ceny zostaną wyświetlone jako 0.00)`);
+        if (!proceed) return;
       }
     }
 
