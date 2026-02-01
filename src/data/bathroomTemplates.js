@@ -12,6 +12,8 @@ export const BATHROOM_TEMPLATES = {
             { name: "Demontaż WC kompakt", qty: 1, unit: "szt", rhPerUnit: 0.5, materialPricePerUnit: 0 },
             { name: "Demontaż umywalki", qty: 1, unit: "szt", rhPerUnit: 0.45, materialPricePerUnit: 0 },
             { name: "Demontaż wanny", qty: 1, unit: "szt", rhPerUnit: 0.7, materialPricePerUnit: 0 },
+            { name: "Demontaż kabiny z brodzikiem", qty: 1, unit: "kpl", rhPerUnit: 1.2, materialPricePerUnit: 0 },
+            { name: "Demontaż kabiny typu Walk-in", qty: 1, unit: "kpl", rhPerUnit: 0.8, materialPricePerUnit: 0 },
             { name: "Wywóz gruzu", qty: 0.5, unit: "m3", rhPerUnit: 1.5, materialPricePerUnit: 0 },
 
             // INSTALACJE
@@ -56,7 +58,7 @@ export const BATHROOM_TEMPLATES = {
             { name: "Gruntowanie sufitu", qty: 6, unit: "m2", rhPerUnit: 0.15, materialPricePerUnit: 2 },
             { name: "Szpachlowanie ubytków na suficie", qty: 2, unit: "m2", rhPerUnit: 0.4, materialPricePerUnit: 5 },
             { name: "Dwukrotne malowanie sufitu", qty: 6, unit: "m2", rhPerUnit: 0.45, materialPricePerUnit: 8 },
-            { name: "Malowanie całych ścian i sufitu", qty: 15, unit: "m2", rhPerUnit: 0.45, materialPricePerUnit: 8 },
+            { name: "Dwukrotne malowanie ścian", qty: 20, unit: "m2", rhPerUnit: 0.45, materialPricePerUnit: 8 },
 
             // WYKOŃCZENIE
             { name: "Montaż listew wykończeniowych", qty: 8, unit: "mb", rhPerUnit: 0.15, materialPricePerUnit: 8 },
