@@ -537,7 +537,7 @@ function App() {
         setOpenIndex(lastIndex);
         updateDropdownPosition(lastIndex); // Otwórz okno propozycji
       }
-    }, 100); // Zwiększono timeout dla pewności
+    }, 10);
   };
 
   const removeItem = (index) => {
