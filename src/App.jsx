@@ -651,6 +651,15 @@ function App() {
   };
 
   const handleDownloadPdf = async () => {
+    // WALIDACJA: Jeśli materiał opłaca wykonawca, sprawdzamy czy ceny są uzupełnione
+    if (materialsBy === 'contractor' && pdfOptions.includeMaterialPrices) {
+      const missingMaterials = items.filter(item => !item.materialPricePerUnit || item.materialPricePerUnit === 0);
+      if (missingMaterials.length > 0) {
+        alert(`❌ BŁĄD GENEROWANIA PDF\n\nWybrano opcję: "Materiał opłaca: Wykonawca", ale ${missingMaterials.length} pozycji nie ma wpisanej ceny materiału.\n\nUzupełnij ceny materiałów lub zmień płatnika na "Klient", aby wygenerować dokument.`);
+        return;
+      }
+    }
+
     const doc = new jsPDF();
 
     // Załaduj czcionkę Roboto z obsługą polskich znaków
