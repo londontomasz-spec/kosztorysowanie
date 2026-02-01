@@ -1127,14 +1127,7 @@ function App() {
       </div>
 
       {/* OSTRZEŻENIA LOGICZNE */}
-      {logicWarnings.length > 0 && (
-        <div style={{ background: theme.warningBg, padding: 16, borderRadius: 8, marginBottom: 24, border: `2px solid ${theme.warning}` }}>
-          <h4 style={{ marginTop: 0, color: theme.warning }}>⚠️ Ostrzeżenia</h4>
-          {logicWarnings.map((w, idx) => (
-            <p key={idx} style={{ margin: '8px 0', color: theme.text }}>• {w.message}</p>
-          ))}
-        </div>
-      )}
+      {/* OSTRZEŻENIA LOGICZNE - USUNIĘTO */}
       {/* TABELA POZYCJI */}
       <div style={{ width: '100%', overflow: 'auto', marginBottom: 24, position: 'relative', zIndex: 100 }}>
         {Object.entries(groupedItems).map(([phaseName, phaseItems]) => (
