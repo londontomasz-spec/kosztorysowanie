@@ -469,6 +469,12 @@ function App() {
     const template = BATHROOM_TEMPLATES[templateKey];
     if (!template) return;
 
+    // Sprawdź limit pozycji (np. demo max 3)
+    if (items.length + template.items.length > maxItems) {
+      alert(`Osiągnięto limit pozycji (${maxItems}). Kup Premium, aby korzystać z pełnych szablonów!`);
+      return;
+    }
+
     const templateItems = template.items.map(item => ({
       name: item.name,
       unit: item.unit,
