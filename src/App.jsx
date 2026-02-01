@@ -95,6 +95,28 @@ const detectWorkPhase = (workName) => {
   return { key: 'other', order: 99, name: 'Inne prace' };
 };
 
+// Mapowanie domyślnych jednostek dla faz z katalogu usług
+const PHASE_UNITS = {
+  preparation: 'kpl',
+  demolition: 'm2',
+  transport: 'm3',
+  masonry: 'm2',
+  electrical: 'szt',
+  plumbing: 'szt',
+  heating: 'szt',
+  plaster: 'm2',
+  flooring: 'm2',
+  ceiling: 'm2',
+  tiles: 'm2',
+  painting: 'm2',
+  decor: 'm2',
+  carpentry: 'szt',
+  bathroom: 'szt',
+  furniture: 'szt',
+  handyman: 'szt',
+  cleaning: 'm2'
+};
+
 // ============================================
 // WALIDACJA KOLEJNOŚCI - USUNIĘTA
 // Użytkownik poprosił o usunięcie ostrzeżeń
@@ -603,6 +625,13 @@ function App() {
 
     // Zamiast brudnej nazwy z buforem zapisujemy wersję „dla człowieka”
     newItems[idx].name = getServiceDisplayName(service);
+
+    // Automatycznie ustawiamy jednostkę (Jm)
+    // 1. Z bazy (jeśli istnieje)
+    // 2. Na podstawie fazy (PHASE_UNITS)
+    // 3. Domyślnie m2
+    const phaseDefault = PHASE_UNITS[service.phase] || 'm2';
+    newItems[idx].unit = service.unit || phaseDefault;
 
     if (!newItems[idx].rhPerUnit || newItems[idx].rhPerUnit === 0) {
       newItems[idx].rhPerUnit = service.rhPerUnit;

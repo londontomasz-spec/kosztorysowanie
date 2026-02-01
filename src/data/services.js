@@ -262,12 +262,14 @@ export const SERVICES = [
   },
   {
     name: "39. Demontaż starych drzwi wewnętrznych",
+    unit: "szt",
     rhPerUnit: 0.5,
     phase: "demolition",
     prerequisites: []
   },
   {
     name: "40. Demontaż drzwi zewnętrznych",
+    unit: "szt",
     rhPerUnit: 0.6,
     phase: "demolition",
     prerequisites: ["10. Oznakowanie stref niebezpiecznych"]
@@ -286,48 +288,56 @@ export const SERVICES = [
   },
   {
     name: "43. Demontaż grzejników",
+    unit: "szt",
     rhPerUnit: 0.5,
     phase: "demolition",
     prerequisites: ["17. Zabezpieczenie systemu CO"]
   },
   {
     name: "44. Demontaż bojlera/ogrzewacza",
+    unit: "szt",
     rhPerUnit: 0.65,
     phase: "demolition",
     prerequisites: ["16. Zabezpieczenie instalacji wod-kan głównej"]
   },
   {
     name: "45. Demontaż wanny",
+    unit: "szt",
     rhPerUnit: 0.7,
     phase: "demolition",
     prerequisites: ["16. Zabezpieczenie instalacji wod-kan głównej"]
   },
   {
     name: "46. Demontaż brodzika prysznicowego",
+    unit: "szt",
     rhPerUnit: 0.6,
     phase: "demolition",
     prerequisites: ["16. Zabezpieczenie instalacji wod-kan głównej"]
   },
   {
     name: "47. Demontaż kabiny prysznicowej",
+    unit: "szt",
     rhPerUnit: 0.6,
     phase: "demolition",
     prerequisites: ["46. Demontaż brodzika prysznicowego"]
   },
   {
     name: "48. Demontaż umywalki",
+    unit: "szt",
     rhPerUnit: 0.45,
     phase: "demolition",
     prerequisites: ["16. Zabezpieczenie instalacji wod-kan głównej"]
   },
   {
     name: "49. Demontaż WC kompakt",
+    unit: "szt",
     rhPerUnit: 0.5,
     phase: "demolition",
     prerequisites: ["16. Zabezpieczenie instalacji wod-kan głównej"]
   },
   {
     name: "50. Demontaż stelaża WC podtynkowego",
+    unit: "szt",
     rhPerUnit: 0.6,
     phase: "demolition",
     prerequisites: ["49. Demontaż WC kompakt"]
@@ -724,18 +734,21 @@ export const SERVICES = [
   // ==========================================
   {
     name: "114. Wykonanie bruzd pod instalacje elektryczne",
+    unit: "mb",
     rhPerUnit: 0.4,
     phase: "electrical",
     prerequisites: ["94. Murowanie ścianek działowych", "101. Wyrównywanie ścian bloczkami"]
   },
   {
     name: "115. Wykonanie bruzd pod instalację elektryczną",
+    unit: "mb",
     rhPerUnit: 0.4,
     phase: "electrical",
     prerequisites: ["94. Murowanie ścianek działowych"]
   },
   {
     name: "116. Montaż przewodów elektrycznych w ścianach",
+    unit: "mb",
     rhPerUnit: 0.6,
     phase: "electrical",
     prerequisites: ["114. Wykonanie bruzd pod instalacje elektryczne"]
@@ -808,6 +821,7 @@ export const SERVICES = [
   },
   {
     name: "128. Montaż nowych rur wod-kan",
+    unit: "mb",
     rhPerUnit: 0.9,
     phase: "plumbing",
     prerequisites: ["59. Usunięcie starych instalacji wod-kan", "94. Murowanie ścianek działowych"]
@@ -3369,5 +3383,5 @@ export const SERVICES = [
     phase: "cleaning",
     prerequisites: ["546. Kontrola jakości sprzątania", "542. Utylizacja resztek chemii"]
   },
- 
+
 ];
