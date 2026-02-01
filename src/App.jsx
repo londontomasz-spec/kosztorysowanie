@@ -529,8 +529,9 @@ function App() {
       if (inputRefs.current[lastIndex]) {
         inputRefs.current[lastIndex].focus();
         setOpenIndex(lastIndex);
+        updateDropdownPosition(lastIndex); // Otwórz okno propozycji
       }
-    }, 0);
+    }, 100); // Zwiększono timeout dla pewności
   };
 
   const removeItem = (index) => {
@@ -1017,55 +1018,7 @@ function App() {
       </div>
 
       {/* ZINTEGROWANY PASEK AKCJI I NARZĘDZI */}
-      <div style={{ background: theme.bgSecondary, padding: 20, borderRadius: 8, marginBottom: 24, border: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-
-        {/* LEWA STRONA: PRZYCISKI EDYCJI */}
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <button onClick={addItem} disabled={items.length >= maxItems} style={{ padding: "10px 20px", background: items.length >= maxItems ? theme.bgTertiary : theme.accent, color: "#fff", border: "none", borderRadius: 4, cursor: items.length >= maxItems ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 'bold' }}>
-            ➕ Dodaj pozycję {!profile?.is_premium && `(${items.length}/${maxItems})`}
-          </button>
-          <button onClick={() => setShowTemplateDialog(true)} style={{ padding: "10px 20px", background: '#059669', color: '#fff', border: "none", borderRadius: 4, cursor: 'pointer', fontSize: 14, fontWeight: 'bold' }}>
-            📋 Wstaw szablon
-          </button>
-        </div>
-
-        {/* PRAWA STRONA: EKSPORT I STAWKA */}
-        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
-          {/* STAWKA GODZINOWA */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: theme.bgTertiary, padding: '6px 12px', borderRadius: 4 }}>
-            <label style={{ fontSize: 13, color: theme.textSecondary, whiteSpace: 'nowrap' }}>
-              Stawka RH:
-            </label>
-            <input
-              type="number"
-              value={hourlyRate}
-              onChange={(e) => handleHourlyRateChange(Number(e.target.value))}
-              min="0"
-              step="1"
-              style={{
-                width: 60,
-                padding: '4px',
-                background: theme.inputBg,
-                border: `1px solid ${theme.borderLight}`,
-                color: theme.text,
-                borderRadius: 4,
-                textAlign: 'right',
-                fontWeight: 'bold'
-              }}
-            />
-            <span style={{ fontSize: 13, color: theme.textMuted }}>PLN</span>
-          </div>
-
-          <div style={{ height: 24, width: 1, background: theme.borderLight }}></div>
-
-          <button onClick={() => setShowPdfOptions(true)} style={{ padding: "10px 16px", background: theme.bgTertiary, color: theme.text, border: `1px solid ${theme.border}`, borderRadius: 4, cursor: "pointer", fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
-            📄 PDF
-          </button>
-          <button onClick={handleDownloadExcel} style={{ padding: "10px 16px", background: theme.bgTertiary, color: theme.text, border: `1px solid ${theme.border}`, borderRadius: 4, cursor: "pointer", fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
-            📊 Excel
-          </button>
-        </div>
-      </div>
+      {/* ZINTEGROWANY PASEK AKCJI - USUNIĘTO (Przeniesiono niżej) */}
 
       {/* SUGESTIE - USUNIĘTO */}
       {/* DANE DOKUMENTU */}
@@ -1261,9 +1214,110 @@ function App() {
         ))}
       </div>
 
-      {/* STARE PRZYCISKI - USUNIĘTO (Przeniesione wyżej) */}
+      {/* ZINTEGROWANY PASEK AKCJI I NARZĘDZI */}
+      <div style={{ background: theme.bgSecondary, padding: 20, borderRadius: 8, marginBottom: 24, border: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+
+        {/* LEWA STRONA: PRZYCISKI EDYCJI */}
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <button onClick={addItem} disabled={items.length >= maxItems} style={{ padding: "10px 20px", background: items.length >= maxItems ? theme.bgTertiary : theme.accent, color: "#fff", border: "none", borderRadius: 4, cursor: items.length >= maxItems ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 'bold' }}>
+            ➕ Dodaj pozycję {!profile?.is_premium && `(${items.length}/${maxItems})`}
+          </button>
+          <button onClick={() => setShowTemplateDialog(true)} style={{ padding: "10px 20px", background: '#059669', color: '#fff', border: "none", borderRadius: 4, cursor: 'pointer', fontSize: 14, fontWeight: 'bold' }}>
+            📋 Wstaw szablon
+          </button>
+        </div>
+
+        {/* PRAWA STRONA: EKSPORT I STAWKA */}
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* STAWKA GODZINOWA - CZERWONA */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#DC2626', padding: '6px 12px', borderRadius: 4, color: '#fff' }}>
+            <label style={{ fontSize: 13, color: '#fff', whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+              Stawka RH:
+            </label>
+            <input
+              type="number"
+              value={hourlyRate}
+              onChange={(e) => handleHourlyRateChange(Number(e.target.value))}
+              min="0"
+              step="1"
+              style={{
+                width: 60,
+                padding: '4px',
+                background: '#fff',
+                border: 'none',
+                color: '#000',
+                borderRadius: 4,
+                textAlign: 'right',
+                fontWeight: 'bold'
+              }}
+            />
+            <span style={{ fontSize: 13, color: '#fff' }}>PLN</span>
+          </div>
+
+          <div style={{ height: 24, width: 1, background: theme.borderLight }}></div>
+
+          <button onClick={() => setShowPdfOptions(true)} style={{ padding: "10px 20px", background: "#3B82F6", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 14, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 6 }}>
+            📄 PDF
+          </button>
+          <button onClick={handleDownloadExcel} style={{ padding: "10px 20px", background: "#1E3A8A", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 14, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 6 }}>
+            📊 Excel
+          </button>
+        </div>
+      </div>
 
       {/* USTAWIENIA */}
+
+      {/* NOWY PASEK NARZĘDZI (POD TABELĄ) */}
+      <div style={{ background: theme.bgSecondary, padding: 20, borderRadius: 8, marginBottom: 24, border: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+
+        {/* LEWA STRONA: PRZYCISKI EDYCJI (Nad ustawieniami) */}
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <button onClick={addItem} disabled={items.length >= maxItems} style={{ padding: "10px 20px", background: items.length >= maxItems ? theme.bgTertiary : theme.accent, color: "#fff", border: "none", borderRadius: 4, cursor: items.length >= maxItems ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 'bold' }}>
+            ➕ Dodaj pozycję {!profile?.is_premium && `(${items.length}/${maxItems})`}
+          </button>
+          <button onClick={() => setShowTemplateDialog(true)} style={{ padding: "10px 20px", background: '#059669', color: '#fff', border: "none", borderRadius: 4, cursor: 'pointer', fontSize: 14, fontWeight: 'bold' }}>
+            📋 Wstaw szablon
+          </button>
+        </div>
+
+        {/* PRAWA STRONA: EKSPORT I STAWKA */}
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* STAWKA GODZINOWA - CZERWONA */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#DC2626', padding: '6px 12px', borderRadius: 4, color: '#fff' }}>
+            <label style={{ fontSize: 13, color: '#fff', whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+              Stawka RH:
+            </label>
+            <input
+              type="number"
+              value={hourlyRate}
+              onChange={(e) => handleHourlyRateChange(Number(e.target.value))}
+              min="0"
+              step="1"
+              style={{
+                width: 60,
+                padding: '4px',
+                background: '#fff',
+                border: 'none',
+                color: '#000',
+                borderRadius: 4,
+                textAlign: 'right',
+                fontWeight: 'bold'
+              }}
+            />
+            <span style={{ fontSize: 13, color: '#fff' }}>PLN</span>
+          </div>
+
+          <div style={{ height: 24, width: 1, background: theme.borderLight }}></div>
+
+          <button onClick={() => setShowPdfOptions(true)} style={{ padding: "10px 20px", background: "#3B82F6", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 14, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 6 }}>
+            📄 PDF
+          </button>
+          <button onClick={handleDownloadExcel} style={{ padding: "10px 20px", background: "#1E3A8A", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 14, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 6 }}>
+            📊 Excel
+          </button>
+        </div>
+      </div>
+
       <div style={{ background: theme.bgSecondary, padding: 20, borderRadius: 8, border: `1px solid ${theme.border}`, marginBottom: 24, position: 'relative', zIndex: 1, transition: 'all 0.3s' }}>
         <h3 style={{ marginTop: 0, marginBottom: 16, color: theme.accent }}>Ustawienia kosztorysu</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16 }}>
