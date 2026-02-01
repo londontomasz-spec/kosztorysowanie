@@ -6,6 +6,7 @@ import PremiumButton from "./components/PremiumButton";
 import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
 import { SERVICES } from "./data/services";
+import { BATHROOM_TEMPLATES } from "./data/bathroomTemplates";
 
 // ============================================
 // KONWERSJA POLSKICH ZNAKÓW DLA PDF
@@ -95,73 +96,9 @@ const detectWorkPhase = (workName) => {
 };
 
 // ============================================
-// WALIDACJA KOLEJNOŚCI LOGICZNEJ
+// WALIDACJA KOLEJNOŚCI - USUNIĘTA
+// Użytkownik poprosił o usunięcie ostrzeżeń
 // ============================================
-const validateWorkOrder = (items) => {
-  const warnings = [];
-  const phases = items.map((item, idx) => (
-    {
-      ...detectWorkPhase(item.name),
-      originalIndex: idx,
-      name: item.name
-    }
-  ));
-
-  for (let i = 1; i < phases.length; i++) {
-    if (phases[i].order < phases[i - 1].order) {
-      warnings.push({
-        index: phases[i].originalIndex,
-        message: `"${phases[i].name}" powinno być wykonane przed "${phases[i - 1].name}"`
-      });
-    }
-  }
-
-  const hasGrounding = items.some(item => item.name.toLowerCase().includes('gruntowanie'));
-  const hasPainting = items.some(item => item.name.toLowerCase().includes('malowanie'));
-  if (hasPainting && !hasGrounding) {
-    warnings.push({
-      index: -1,
-      message: 'Sugerujemy dodanie gruntowania przed malowaniem'
-    });
-  }
-
-  return warnings;
-};
-
-// ============================================
-// SUGEROWANIE BRAKUJĄCYCH POZYCJI
-// ============================================
-const suggestMissingWorks = (items) => {
-  const suggestions = [];
-  const workNames = items.map(i => i.name.toLowerCase()).join(' ');
-
-  const rules = [
-    {
-      condition: () => workNames.includes('glazur') && !workNames.includes('fugowanie'),
-      suggestion: 'Fugowanie nowych plytek (osobno)'
-    },
-    {
-      condition: () => workNames.includes('panel') && !workNames.includes('listew'),
-      suggestion: 'Montaz listew przypodlogowych MDF'
-    },
-    {
-      condition: () => workNames.includes('wylewka') && !workNames.includes('panel') && !workNames.includes('parkiet'),
-      suggestion: 'Rozważ dodanie montażu paneli podłogowych'
-    },
-    {
-      condition: () => workNames.includes('tynk') && !workNames.includes('gladz'),
-      suggestion: 'Gladz gipsowa na scianach'
-    }
-  ];
-
-  rules.forEach(rule => {
-    if (rule.condition()) {
-      suggestions.push(rule.suggestion);
-    }
-  });
-
-  return suggestions;
-};
 
 // ============================================
 // MOTYWY KOLORYSTYCZNE
@@ -253,9 +190,11 @@ function App() {
   const [showLoadDialog, setShowLoadDialog] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-  const [logicWarnings, setLogicWarnings] = useState([]);
-  const [suggestions, setSuggestions] = useState([]);
   const [groupByPhase, setGroupByPhase] = useState(false);
+
+  // NOWE: Stawka za roboczogodzinę
+  const [hourlyRate, setHourlyRate] = useState(34); // Domyślnie 34 PLN (KNR 2024)
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
 
   // ========== REFY (useRef) ==========
   const inputRefs = useRef([]);
@@ -309,13 +248,9 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const warnings = validateWorkOrder(items);
-    setLogicWarnings(warnings);
+  // USUNIĘTO: useEffect z walidacją kolejności prac
+  // Użytkownik poprosił o usunięcie ostrzeżeń
 
-    const newSuggestions = suggestMissingWorks(items);
-    setSuggestions(newSuggestions);
-  }, [items]);
   useEffect(() => {
     const handleScroll = () => {
       if (openIndex !== null && inputRefs.current[openIndex]) {
@@ -502,6 +437,35 @@ function App() {
     await supabase.auth.signOut();
     setSession(null);
     setProfile(null);
+  };
+
+  // NOWA FUNKCJA: Zmiana stawki za RH - przelicza wszystkie pozycje
+  const handleHourlyRateChange = (newRate) => {
+    setHourlyRate(newRate);
+    const updatedItems = items.map(item => ({
+      ...item,
+      laborPrice: item.rhPerUnit * newRate
+    }));
+    setItems(updatedItems);
+  };
+
+  // NOWA FUNKCJA: Wstawianie szablonu łazienki
+  const insertTemplate = (templateKey) => {
+    const template = BATHROOM_TEMPLATES[templateKey];
+    if (!template) return;
+
+    const templateItems = template.items.map(item => ({
+      name: item.name,
+      unit: item.unit,
+      qty: item.qty,
+      laborPrice: item.rhPerUnit * hourlyRate, // Auto-wyliczenie ceny
+      materialPricePerUnit: item.materialPricePerUnit,
+      rhPerUnit: item.rhPerUnit
+    }));
+
+    setItems([...items, ...templateItems]);
+    setShowTemplateDialog(false);
+    alert(`✅ Dodano szablon: ${template.name} (${templateItems.length} pozycji)`);
   };
 
   const handleChange = (index, field, value) => {
@@ -1052,17 +1016,55 @@ function App() {
         </div>
       </div>
 
-      {/* SUGESTIE */}
-      {suggestions.length > 0 && (
-        <div style={{ background: theme.accentLight, padding: 16, borderRadius: 8, marginBottom: 24, border: `1px solid ${theme.accent}` }}>
-          <h4 style={{ marginTop: 0, color: theme.accent }}>💡 Sugestie brakujących pozycji</h4>
-          {suggestions.map((s, idx) => (
-            <div key={idx} style={{ margin: '8px 0', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ color: theme.text }}>• {s}</span>
-            </div>
-          ))}
+      {/* NOWE: STAWKA ZA ROBOCZOGODZINĘ I SZABLONY */}
+      <div style={{ background: theme.bgSecondary, padding: 16, borderRadius: 8, marginBottom: 24, border: `1px solid ${theme.border}`, transition: 'all 0.3s' }}>
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ flex: '1 1 250px' }}>
+            <label style={{ display: 'block', marginBottom: 4, fontSize: 14, color: theme.textSecondary }}>
+              Stawka za roboczogodzinę (PLN netto)
+            </label>
+            <input
+              type="number"
+              value={hourlyRate}
+              onChange={(e) => handleHourlyRateChange(Number(e.target.value))}
+              min="0"
+              step="1"
+              style={{
+                width: '100%',
+                padding: '8px',
+                background: theme.inputBg,
+                border: `1px solid ${theme.borderLight}`,
+                color: theme.text,
+                borderRadius: 4,
+                boxSizing: 'border-box',
+                fontSize: 16
+              }}
+            />
+            <small style={{ color: theme.textSecondary, fontSize: 12 }}>
+              Rekomendowana: 34 PLN (podstawowa) lub 40 PLN (specjalistyczna)
+            </small>
+          </div>
+          <div style={{ flex: '0 0 auto', alignSelf: 'flex-end' }}>
+            <button
+              onClick={() => setShowTemplateDialog(true)}
+              style={{
+                padding: '10px 20px',
+                background: '#10b981',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 4,
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: 14
+              }}
+            >
+              📋 Wstaw szablon łazienki
+            </button>
+          </div>
         </div>
-      )}
+      </div>
+
+      {/* SUGESTIE - USUNIĘTO */}
       {/* DANE DOKUMENTU */}
       <div style={{ background: theme.bgSecondary, padding: 16, borderRadius: 8, marginBottom: 24, border: `1px solid ${theme.border}`, transition: 'all 0.3s' }}>
         <h3 style={{ marginTop: 0, marginBottom: 16, color: theme.accent }}>Dane dokumentu</h3>
@@ -1413,6 +1415,45 @@ function App() {
               ×
             </button>
             <Auth onSuccess={() => setShowLoginModal(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* MODAL SZABLONÓW */}
+      {showTemplateDialog && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000 }}>
+          <div style={{ background: theme.bgSecondary, padding: 32, borderRadius: 8, maxWidth: 600, width: '90%', border: `2px solid ${theme.accent}`, color: theme.text }}>
+            <h2 style={{ marginTop: 0, color: theme.accent }}>Wybierz szablon łazienki</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {Object.entries(BATHROOM_TEMPLATES).map(([key, template]) => (
+                <button
+                  key={key}
+                  onClick={() => insertTemplate(key)}
+                  style={{
+                    padding: 20,
+                    background: theme.bgTertiary,
+                    border: `1px solid ${theme.borderLight}`,
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.2s',
+                    ':hover': { transform: 'translateY(-2px)' }
+                  }}
+                >
+                  <strong style={{ fontSize: 18, display: 'block', marginBottom: 6, color: theme.accent }}>{template.name}</strong>
+                  <span style={{ color: theme.textSecondary }}>{template.description}</span>
+                  <div style={{ marginTop: 8, fontSize: 13, color: theme.textMuted }}>
+                    Liczba pozycji: {template.items.length} | Szacowane RH: {template.items.reduce((acc, i) => acc + i.qty * i.rhPerUnit, 0).toFixed(1)}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowTemplateDialog(false)}
+              style={{ marginTop: 24, padding: "10px 20px", background: theme.bgTertiary, color: theme.text, border: "none", borderRadius: 4, cursor: "pointer", fontSize: 16, fontWeight: 500, width: '100%' }}
+            >
+              Anuluj
+            </button>
           </div>
         </div>
       )}
