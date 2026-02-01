@@ -46,7 +46,9 @@ export const BATHROOM_TEMPLATES = {
             { name: "Montaż bidetki", qty: 1, unit: "szt", rhPerUnit: 0.8, materialPricePerUnit: 0 },
 
             // ELEKTRYKA
-            { name: "Montaż opraw oświetleniowych", qty: 3, unit: "szt", rhPerUnit: 0.5, materialPricePerUnit: 0 },
+            { name: "Montaż lampy sufitowej (plafon)", qty: 1, unit: "szt", rhPerUnit: 0.6, materialPricePerUnit: 0 },
+            { name: "Montaż kinkietu (lampa ścienna)", qty: 1, unit: "szt", rhPerUnit: 0.6, materialPricePerUnit: 0 },
+            { name: "Montaż opraw oświetleniowych (inne)", qty: 1, unit: "szt", rhPerUnit: 0.5, materialPricePerUnit: 0 },
             { name: "Montaż gniazd wtykowych", qty: 2, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Montaż włączników/łączników", qty: 2, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Montaż wentylatora łazienkowego", qty: 1, unit: "szt", rhPerUnit: 0.8, materialPricePerUnit: 0 },
@@ -120,7 +122,9 @@ export const BATHROOM_TEMPLATES = {
             { name: "Montaż bidetki", qty: 1, unit: "szt", rhPerUnit: 0.8, materialPricePerUnit: 0 },
 
             // ELEKTRYKA
-            { name: "Montaż opraw LED sufitowych", qty: 4, unit: "szt", rhPerUnit: 0.5, materialPricePerUnit: 0 },
+            { name: "Montaż lampy sufitowej (plafon)", qty: 1, unit: "szt", rhPerUnit: 0.6, materialPricePerUnit: 0 },
+            { name: "Montaż kinkietu (lampa ścienna)", qty: 2, unit: "szt", rhPerUnit: 0.6, materialPricePerUnit: 0 },
+            { name: "Montaż opraw LED sufitowych (oczka)", qty: 4, unit: "szt", rhPerUnit: 0.5, materialPricePerUnit: 0 },
             { name: "Montaż gniazd wtykowych", qty: 3, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Montaż włączników/łączników", qty: 3, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Montaż wentylatora z czujnikiem wilgotności", qty: 1, unit: "szt", rhPerUnit: 1.0, materialPricePerUnit: 0 },

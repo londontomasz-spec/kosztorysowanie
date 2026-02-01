@@ -459,7 +459,7 @@ function App() {
     setHourlyRate(newRate);
     const updatedItems = items.map(item => ({
       ...item,
-      laborPrice: item.rhPerUnit * newRate
+      laborPrice: Number((item.rhPerUnit * newRate).toFixed(2))
     }));
     setItems(updatedItems);
   };
@@ -473,7 +473,7 @@ function App() {
       name: item.name,
       unit: item.unit,
       qty: item.qty,
-      laborPrice: item.rhPerUnit * hourlyRate, // Auto-wyliczenie ceny
+      laborPrice: Number((item.rhPerUnit * hourlyRate).toFixed(2)), // Auto-wyliczenie ceny
       materialPricePerUnit: item.materialPricePerUnit,
       rhPerUnit: item.rhPerUnit
     }));
