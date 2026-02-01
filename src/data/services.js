@@ -451,6 +451,13 @@ export const SERVICES = [
     prerequisites: ["15. Zabezpieczenie instalacji elektrycznej głównej"]
   },
   {
+    name: "69. Demontaż listew przypodłogowych",
+    unit: "mb",
+    rhPerUnit: 0.15,
+    phase: "demolition",
+    prerequisites: ["37. Zrywanie paneli podłogowych", "38. Usunięcie starego parkietu"]
+  },
+  {
     name: "69. Zrywanie starej tapety (Powt.)",
     rhPerUnit: 0.35,
     phase: "painting",
@@ -1796,6 +1803,13 @@ export const SERVICES = [
     rhPerUnit: 0.65,
     phase: "flooring",
     prerequisites: ["274. Montaż deski Barlineckiej"]
+  },
+  {
+    name: "287. Montaż listew przypodłogowych",
+    unit: "mb",
+    rhPerUnit: 0.25,
+    phase: "flooring",
+    prerequisites: ["269. Montaż paneli podłogowych", "273. Montaż parkietu drewnianego"]
   },
   {
     name: "288. Montaż wykładziny PCV",

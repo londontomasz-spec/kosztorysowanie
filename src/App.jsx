@@ -74,12 +74,12 @@ const WORK_PHASES = {
   masonry: { order: 2, name: 'Roboty murowe', keywords: ['murowanie', 'zamurowanie', 'scianki'] },
   installations: { order: 3, name: 'Instalacje', keywords: ['instalacja', 'podejscia', 'bruzd', 'wod-kan', 'elektryczna', 'gniazd', 'wylacznikow'] },
   plaster: { order: 4, name: 'Tynki i wyrównywanie', keywords: ['tynk', 'wyrownywanie', 'gladz', 'szpachlowanie'] },
-  flooring: { order: 5, name: 'Podłogi', keywords: ['wylewka', 'panel', 'parkiet', 'cyklinowanie', 'podlog'] },
-  tiles: { order: 6, name: 'Płytki', keywords: ['plyt', 'glazur', 'terakot', 'ukladanie', 'fugowanie', 'oplytkowanie'] },
+  flooring: { order: 5, name: 'Podłogi', keywords: ['wylewka', 'panel', 'parkiet', 'cyklinowanie', 'podlog', 'listwy', 'przypodlo'] },
+  tiles: { order: 6, name: 'Płytki', keywords: ['plyt', 'glazur', 'terakot', 'ukladanie', 'fugowanie', 'oplytkowanie', 'cokol'] },
   plumbing: { order: 7, name: 'Armatura i wyposażenie', keywords: ['montaz', 'wanna', 'kabina', 'umywalka', 'bateria', 'zlew'] },
-  carpentry: { order: 8, name: 'Stolarka', keywords: ['drzwi', 'okien', 'parapetow'] },
+  carpentry: { order: 8, name: 'Stolarka', keywords: ['drzwi', 'okien', 'parapet'] },
   ceiling: { order: 9, name: 'Sufity', keywords: ['sufit'] },
-  painting: { order: 10, name: 'Malowanie i wykończenia', keywords: ['malowanie', 'gruntowanie', 'tapetowanie', 'listew', 'sztukateria'] },
+  painting: { order: 10, name: 'Malowanie i wykończenia', keywords: ['malowanie', 'gruntowanie', 'tapetowanie', 'sztukateria'] },
   electrical: { order: 11, name: 'Montaż urządzeń elektrycznych', keywords: ['oswietlen', 'halogen', 'oczka'] },
   heating: { order: 12, name: 'Ogrzewanie', keywords: ['grzejnik', 'c.o.', 'piec'] },
   cleaning: { order: 13, name: 'Sprzątanie', keywords: ['sprzatanie', 'utylizacja'] }
@@ -628,10 +628,21 @@ function App() {
 
     // Automatycznie ustawiamy jednostkę (Jm)
     // 1. Z bazy (jeśli istnieje)
-    // 2. Na podstawie fazy (PHASE_UNITS)
-    // 3. Domyślnie m2
-    const phaseDefault = PHASE_UNITS[service.phase] || 'm2';
-    newItems[idx].unit = service.unit || phaseDefault;
+    // 2. Specyficzne wyjątki (np. listwy -> mb)
+    // 3. Na podstawie fazy (PHASE_UNITS)
+    // 4. Domyślnie m2
+    let unit = service.unit;
+    if (!unit) {
+      const nameLower = service.name.toLowerCase();
+      if (nameLower.includes('listwy') || nameLower.includes('listew')) {
+        // Listwy dekoracyjne sufitowe zostawiamy jako m2/szt zależnie od bazy,
+        // ale przypodłogowe i standardowe "listwy" to zazwyczaj mb.
+        if (!nameLower.includes('sufit')) {
+          unit = 'mb';
+        }
+      }
+    }
+    newItems[idx].unit = unit || PHASE_UNITS[service.phase] || 'm2';
 
     if (!newItems[idx].rhPerUnit || newItems[idx].rhPerUnit === 0) {
       newItems[idx].rhPerUnit = service.rhPerUnit;
