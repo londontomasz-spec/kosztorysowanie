@@ -1105,19 +1105,20 @@ function App() {
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 1400, tableLayout: "fixed" }}>
               <colgroup>
                 <col style={{ width: "28%" }} />
-                <col style={{ width: "7%" }} />
-                <col style={{ width: "7%" }} />
-                <col style={{ width: "7%" }} />
-                <col style={{ width: "7%" }} />
-                <col style={{ width: "7%" }} />
-                <col style={{ width: "7%" }} />
-                <col style={{ width: "7%" }} />
-                <col style={{ width: "7%" }} />
                 <col style={{ width: "4%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "7%" }} />
               </colgroup>
               <thead>
                 <tr style={{ background: theme.accent }}>
                   <th style={{ padding: '10px 4px', textAlign: "left", color: '#fff', fontSize: 12 }}>Pozycja</th>
+                  <th style={{ padding: '10px 4px', color: '#fff', fontSize: 12 }}>Usuń</th>
                   <th style={{ padding: '10px 4px', color: '#fff', fontSize: 12 }}>Ilość</th>
                   <th style={{ padding: '10px 4px', color: '#fff', fontSize: 12 }}>Jm</th>
                   <th style={{ padding: '10px 4px', color: '#fff', fontSize: 12 }}>Cena rob.</th>
@@ -1126,7 +1127,6 @@ function App() {
                   <th style={{ padding: '10px 4px', color: '#fff', fontSize: 12, background: '#0d5d58' }}>Mat. razem</th>
                   <th style={{ padding: '10px 4px', color: '#fff', fontSize: 12 }}>RH/jdn.</th>
                   <th style={{ padding: '10px 4px', color: '#fff', fontSize: 12 }}>Suma RH</th>
-                  <th style={{ padding: '10px 4px', color: '#fff', fontSize: 12 }}>Usuń</th>
                 </tr>
               </thead>
               <tbody>
@@ -1176,6 +1176,9 @@ function App() {
                         )}
                       </td>
                       <td style={{ textAlign: "center", padding: "6px" }}>
+                        <button onClick={() => removeItem(idx)} style={{ background: "#dc2626", color: "#fff", border: "none", borderRadius: 4, padding: "6px 8px", cursor: "pointer", fontWeight: 'bold', fontSize: 12 }}>X</button>
+                      </td>
+                      <td style={{ textAlign: "center", padding: "6px" }}>
                         <input style={{ width: '100%', maxWidth: '100%', minWidth: 0, textAlign: "center", padding: '6px', background: theme.inputBg, border: `1px solid ${theme.borderLight}`, color: theme.text, borderRadius: 4, boxSizing: 'border-box', transition: 'all 0.3s', fontSize: 12 }} type="number" min={0} value={item.qty} onChange={(e) => handleChange(idx, "qty", e.target.value)} />
                       </td>
                       <td style={{ textAlign: "center", padding: "6px" }}>
@@ -1210,9 +1213,7 @@ function App() {
                       <td style={{ textAlign: "right", padding: "6px" }}>
                         <div style={{ background: itemRH > 0 ? theme.accentLight : 'transparent', padding: '6px', borderRadius: 4, fontWeight: 500, color: itemRH > 0 ? (isDarkMode ? '#5eead4' : '#0f766e') : theme.textMuted, transition: 'all 0.3s', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12 }}>{itemRH.toFixed(2)}</div>
                       </td>
-                      <td style={{ textAlign: "center", padding: "6px" }}>
-                        <button onClick={() => removeItem(idx)} style={{ background: "#dc2626", color: "#fff", border: "none", borderRadius: 4, padding: "6px 8px", cursor: "pointer", fontWeight: 'bold', fontSize: 12 }}>X</button>
-                      </td>
+
                     </tr>
                   );
                 })}
