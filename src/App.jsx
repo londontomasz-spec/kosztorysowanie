@@ -193,7 +193,7 @@ function App() {
   const [groupByPhase, setGroupByPhase] = useState(false);
 
   // NOWE: Stawka za roboczogodzinę
-  const [hourlyRate, setHourlyRate] = useState(34); // Domyślnie 34 PLN (KNR 2024)
+  const [hourlyRate, setHourlyRate] = useState(200); // Domyślnie 200 PLN
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
 
   // ========== REFY (useRef) ==========
@@ -589,7 +589,7 @@ function App() {
       newItems[idx].laborPrice = Number((service.rhPerUnit * hourlyRate).toFixed(2));
     }
     if (!newItems[idx].materialPricePerUnit || newItems[idx].materialPricePerUnit === 0) {
-      newItems[idx].materialPricePerUnit = service.suggestedMaterial;
+      newItems[idx].materialPricePerUnit = service.suggestedMaterial || 0;
     }
     setItems(newItems);
     setOpenIndex(null);
@@ -626,8 +626,8 @@ function App() {
         item.unit,
         item.laborPrice.toFixed(2),
         (item.qty * item.laborPrice).toFixed(2),
-        item.materialPricePerUnit.toFixed(2),
-        (item.qty * item.materialPricePerUnit).toFixed(2),
+        (item.materialPricePerUnit || 0).toFixed(2),
+        (item.qty * (item.materialPricePerUnit || 0)).toFixed(2),
         item.rhPerUnit.toFixed(2),
         (item.qty * item.rhPerUnit).toFixed(2)
       ]),
@@ -823,9 +823,9 @@ function App() {
       }
 
       if (pdfOptions.includeMaterialPrices && pdfOptions.includeMaterialCosts) {
-        doc.text(item.materialPricePerUnit.toFixed(2), currentX, dataY);
+        doc.text((item.materialPricePerUnit || 0).toFixed(2), currentX, dataY);
         currentX += colWidths.materialUnit;
-        doc.text((item.qty * item.materialPricePerUnit).toFixed(2), currentX, dataY);
+        doc.text((item.qty * (item.materialPricePerUnit || 0)).toFixed(2), currentX, dataY);
         currentX += colWidths.materialTotal;
       }
 
@@ -837,7 +837,7 @@ function App() {
       const itemTotal =
         item.qty * item.laborPrice +
         (pdfOptions.includeMaterialCosts && materialsBy === 'contractor'
-          ? item.qty * item.materialPricePerUnit
+          ? item.qty * (item.materialPricePerUnit || 0)
           : 0);
       doc.text(`${itemTotal.toFixed(2)}`, currentX, dataY);
 
