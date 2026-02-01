@@ -475,6 +475,12 @@ function App() {
     } else {
       newItems[index][field] = value;
     }
+
+    // Auto-update labor price if RH/unit changes
+    if (field === 'rhPerUnit') {
+      newItems[index].laborPrice = Number((newItems[index][field] * hourlyRate).toFixed(2));
+    }
+
     setItems(newItems);
   };
   const updateDropdownPosition = (idx) => {
@@ -579,6 +585,8 @@ function App() {
 
     if (!newItems[idx].rhPerUnit || newItems[idx].rhPerUnit === 0) {
       newItems[idx].rhPerUnit = service.rhPerUnit;
+      // Auto-calculate labor price based on global hourly rate
+      newItems[idx].laborPrice = Number((service.rhPerUnit * hourlyRate).toFixed(2));
     }
     if (!newItems[idx].materialPricePerUnit || newItems[idx].materialPricePerUnit === 0) {
       newItems[idx].materialPricePerUnit = service.suggestedMaterial;
@@ -1214,56 +1222,7 @@ function App() {
         ))}
       </div>
 
-      {/* ZINTEGROWANY PASEK AKCJI I NARZĘDZI */}
-      <div style={{ background: theme.bgSecondary, padding: 20, borderRadius: 8, marginBottom: 24, border: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
 
-        {/* LEWA STRONA: PRZYCISKI EDYCJI */}
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <button onClick={addItem} disabled={items.length >= maxItems} style={{ padding: "10px 20px", background: items.length >= maxItems ? theme.bgTertiary : theme.accent, color: "#fff", border: "none", borderRadius: 4, cursor: items.length >= maxItems ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 'bold' }}>
-            ➕ Dodaj pozycję {!profile?.is_premium && `(${items.length}/${maxItems})`}
-          </button>
-          <button onClick={() => setShowTemplateDialog(true)} style={{ padding: "10px 20px", background: '#059669', color: '#fff', border: "none", borderRadius: 4, cursor: 'pointer', fontSize: 14, fontWeight: 'bold' }}>
-            📋 Wstaw szablon
-          </button>
-        </div>
-
-        {/* PRAWA STRONA: EKSPORT I STAWKA */}
-        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
-          {/* STAWKA GODZINOWA - CZERWONA */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#DC2626', padding: '6px 12px', borderRadius: 4, color: '#fff' }}>
-            <label style={{ fontSize: 13, color: '#fff', whiteSpace: 'nowrap', fontWeight: 'bold' }}>
-              Stawka RH:
-            </label>
-            <input
-              type="number"
-              value={hourlyRate}
-              onChange={(e) => handleHourlyRateChange(Number(e.target.value))}
-              min="0"
-              step="1"
-              style={{
-                width: 60,
-                padding: '4px',
-                background: '#fff',
-                border: 'none',
-                color: '#000',
-                borderRadius: 4,
-                textAlign: 'right',
-                fontWeight: 'bold'
-              }}
-            />
-            <span style={{ fontSize: 13, color: '#fff' }}>PLN</span>
-          </div>
-
-          <div style={{ height: 24, width: 1, background: theme.borderLight }}></div>
-
-          <button onClick={() => setShowPdfOptions(true)} style={{ padding: "10px 20px", background: "#3B82F6", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 14, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 6 }}>
-            📄 PDF
-          </button>
-          <button onClick={handleDownloadExcel} style={{ padding: "10px 20px", background: "#1E3A8A", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 14, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 6 }}>
-            📊 Excel
-          </button>
-        </div>
-      </div>
 
       {/* USTAWIENIA */}
 
@@ -1275,8 +1234,8 @@ function App() {
           <button onClick={addItem} disabled={items.length >= maxItems} style={{ padding: "10px 20px", background: items.length >= maxItems ? theme.bgTertiary : theme.accent, color: "#fff", border: "none", borderRadius: 4, cursor: items.length >= maxItems ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 'bold' }}>
             ➕ Dodaj pozycję {!profile?.is_premium && `(${items.length}/${maxItems})`}
           </button>
-          <button onClick={() => setShowTemplateDialog(true)} style={{ padding: "10px 20px", background: '#059669', color: '#fff', border: "none", borderRadius: 4, cursor: 'pointer', fontSize: 14, fontWeight: 'bold' }}>
-            📋 Wstaw szablon
+          <button onClick={() => setShowTemplateDialog(true)} style={{ padding: "10px 20px", background: '#3B82F6', color: '#fff', border: "none", borderRadius: 4, cursor: 'pointer', fontSize: 14, fontWeight: 'bold' }}>
+            🛁 Łazienka
           </button>
         </div>
 
