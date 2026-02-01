@@ -195,6 +195,21 @@ function App() {
   // NOWE: Stawka za roboczogodzinę
   const [hourlyRate, setHourlyRate] = useState(200); // Domyślnie 200 PLN
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  useEffect(() => {
+    const disclaimerAccepted = localStorage.getItem('disclaimerAccepted');
+    if (disclaimerAccepted !== 'true') {
+      setShowDisclaimer(true);
+    }
+  }, []);
+
+  const handleDisclaimerClose = (doNotShowAgain) => {
+    if (doNotShowAgain) {
+      localStorage.setItem('disclaimerAccepted', 'true');
+    }
+    setShowDisclaimer(false);
+  };
 
   // ========== REFY (useRef) ==========
   const inputRefs = useRef([]);
@@ -1461,6 +1476,38 @@ function App() {
               style={{ marginTop: 24, padding: "10px 20px", background: theme.bgTertiary, color: theme.text, border: "none", borderRadius: 4, cursor: "pointer", fontSize: 16, fontWeight: 500, width: '100%' }}
             >
               Anuluj
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DISCLAIMER */}
+      {showDisclaimer && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <div style={{ background: theme.bgSecondary, padding: 32, borderRadius: 8, maxWidth: 600, width: '90%', border: `2px solid ${theme.accent}`, color: theme.text, boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, color: '#F59E0B' }}>
+              <span style={{ fontSize: 32 }}>⚠️</span>
+              <h2 style={{ margin: 0, fontSize: 24, fontWeight: 'bold' }}>Ważna informacja</h2>
+            </div>
+
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: theme.text, marginBottom: 24 }}>
+              Podane na stronie stawki roboczogodziny (RH) i inne mają charakter poglądowy i służą wyłącznie celom informacyjnym.
+              Przed ich zastosowaniem powinny zostać samodzielnie zweryfikowane przez użytkownika i dostosowane do aktualnych warunków rynkowych oraz indywidualnych ustaleń.
+            </p>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', marginBottom: 24, padding: '12px', background: theme.bgTertiary, borderRadius: 6 }}>
+              <input type="checkbox" id="dontShowAgain" style={{ width: 18, height: 18 }} />
+              <span style={{ fontSize: 14 }}>Nie pokazuj tego ponownie</span>
+            </label>
+
+            <button
+              onClick={() => {
+                const checkbox = document.getElementById('dontShowAgain');
+                handleDisclaimerClose(checkbox.checked);
+              }}
+              style={{ width: '100%', padding: "14px", background: theme.accent, color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 16, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1 }}
+            >
+              Rozumiem, przejdź do aplikacji
             </button>
           </div>
         </div>
