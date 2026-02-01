@@ -34,26 +34,34 @@ export const BATHROOM_TEMPLATES = {
             { name: "Montaż WC kompakt", qty: 1, unit: "szt", rhPerUnit: 1.2, materialPricePerUnit: 0 },
             { name: "Montaż umywalki z szafką", qty: 1, unit: "szt", rhPerUnit: 1.0, materialPricePerUnit: 0 },
             { name: "Montaż kabiny prysznicowej", qty: 1, unit: "szt", rhPerUnit: 2.5, materialPricePerUnit: 0 },
+            { name: "Montaż kabiny typu Walk-in + odpływ liniowy", qty: 1, unit: "kpl", rhPerUnit: 4.0, materialPricePerUnit: 0 },
             { name: "Montaż baterii umywalkowej", qty: 1, unit: "szt", rhPerUnit: 0.6, materialPricePerUnit: 0 },
             { name: "Montaż baterii prysznicowej", qty: 1, unit: "szt", rhPerUnit: 0.7, materialPricePerUnit: 0 },
             { name: "Montaż lustra", qty: 1, unit: "szt", rhPerUnit: 0.4, materialPricePerUnit: 0 },
+            { name: "Montaż wanny", qty: 1, unit: "szt", rhPerUnit: 2.5, materialPricePerUnit: 0 },
+            { name: "Obudowa wanny (płytki)", qty: 1, unit: "kpl", rhPerUnit: 3.0, materialPricePerUnit: 100 },
             { name: "Montaż grzejnika łazienkowego", qty: 1, unit: "szt", rhPerUnit: 1.5, materialPricePerUnit: 0 },
+            { name: "Montaż bidetki", qty: 1, unit: "szt", rhPerUnit: 0.8, materialPricePerUnit: 0 },
 
             // ELEKTRYKA
             { name: "Montaż opraw oświetleniowych", qty: 3, unit: "szt", rhPerUnit: 0.5, materialPricePerUnit: 0 },
             { name: "Montaż gniazd wtykowych", qty: 2, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Montaż włączników/łączników", qty: 2, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Montaż wentylatora łazienkowego", qty: 1, unit: "szt", rhPerUnit: 0.8, materialPricePerUnit: 0 },
+            { name: "Podłączenie pralki", qty: 1, unit: "szt", rhPerUnit: 0.8, materialPricePerUnit: 15 },
+            { name: "Podłączenie suszarki elektrycznej", qty: 1, unit: "szt", rhPerUnit: 0.5, materialPricePerUnit: 0 },
+            { name: "Montaż ogrzewania podłogowego (maty)", qty: 4, unit: "m2", rhPerUnit: 0.6, materialPricePerUnit: 80 },
 
             // SUFIT I MALOWANIE
             { name: "Gruntowanie sufitu", qty: 6, unit: "m2", rhPerUnit: 0.15, materialPricePerUnit: 2 },
             { name: "Szpachlowanie ubytków na suficie", qty: 2, unit: "m2", rhPerUnit: 0.4, materialPricePerUnit: 5 },
             { name: "Dwukrotne malowanie sufitu", qty: 6, unit: "m2", rhPerUnit: 0.45, materialPricePerUnit: 8 },
-            { name: "Malowanie fragmentów ścian (nad płytkami)", qty: 5, unit: "m2", rhPerUnit: 0.45, materialPricePerUnit: 8 },
+            { name: "Malowanie całych ścian i sufitu", qty: 15, unit: "m2", rhPerUnit: 0.45, materialPricePerUnit: 8 },
 
             // WYKOŃCZENIE
             { name: "Montaż listew wykończeniowych", qty: 8, unit: "mb", rhPerUnit: 0.15, materialPricePerUnit: 8 },
             { name: "Uszczelnienie silikonem", qty: 10, unit: "mb", rhPerUnit: 0.2, materialPricePerUnit: 3 },
+            { name: "Montaż uchwytów na ręczniki/papier", qty: 4, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Sprzątanie końcowe", qty: 6, unit: "m2", rhPerUnit: 0.3, materialPricePerUnit: 0 }
         ]
     },
@@ -104,19 +112,26 @@ export const BATHROOM_TEMPLATES = {
             { name: "Montaż lustra z oświetleniem LED", qty: 1, unit: "szt", rhPerUnit: 0.8, materialPricePerUnit: 0 },
             { name: "Montaż grzejnika dekoracyjnego", qty: 1, unit: "szt", rhPerUnit: 1.5, materialPricePerUnit: 0 },
 
+            // OPCJE KĄPIELOWE (Do wyboru)
+            { name: "Montaż wanny z obudową", qty: 1, unit: "kpl", rhPerUnit: 4.5, materialPricePerUnit: 0 },
+            { name: "Montaż kabiny z brodzikiem", qty: 1, unit: "kpl", rhPerUnit: 3.5, materialPricePerUnit: 0 },
+            { name: "Montaż bidetki", qty: 1, unit: "szt", rhPerUnit: 0.8, materialPricePerUnit: 0 },
+
             // ELEKTRYKA
             { name: "Montaż opraw LED sufitowych", qty: 4, unit: "szt", rhPerUnit: 0.5, materialPricePerUnit: 0 },
             { name: "Montaż gniazd wtykowych", qty: 3, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Montaż włączników/łączników", qty: 3, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Montaż wentylatora z czujnikiem wilgotności", qty: 1, unit: "szt", rhPerUnit: 1.0, materialPricePerUnit: 0 },
-            { name: "Montaż ogrzewania podłogowego (mat)", qty: 4, unit: "m2", rhPerUnit: 0.6, materialPricePerUnit: 80 },
+            { name: "Montaż ogrzewania podłogowego (maty)", qty: 4, unit: "m2", rhPerUnit: 0.6, materialPricePerUnit: 80 },
+            { name: "Podłączenie pralki", qty: 1, unit: "szt", rhPerUnit: 0.8, materialPricePerUnit: 15 },
+            { name: "Podłączenie suszarki", qty: 1, unit: "szt", rhPerUnit: 0.5, materialPricePerUnit: 0 },
 
             // DODATKOWE MALOWANIE
             { name: "Malowanie ścian (powierzchnie bez płytek)", qty: 8, unit: "m2", rhPerUnit: 0.45, materialPricePerUnit: 8 },
 
             // WYKOŃCZENIE
             { name: "Uszczelnienie silikonem", qty: 12, unit: "mb", rhPerUnit: 0.2, materialPricePerUnit: 3 },
-            { name: "Montaż akcesoriów łazienkowych", qty: 5, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
+            { name: "Montaż akcesoriów łazienkowych (uchwyty, wieszaki)", qty: 5, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Sprzątanie końcowe", qty: 6, unit: "m2", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Odbiór końcowy i instruktaż", qty: 1, unit: "kpl", rhPerUnit: 1.0, materialPricePerUnit: 0 }
         ]
