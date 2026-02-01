@@ -1378,7 +1378,7 @@ export const SERVICES = [
     name: "220. Gruntowanie sufitów",
     rhPerUnit: 0.2,
     phase: "painting",
-    prerequisites: ["218. Gruntowanie sufitów"]
+    prerequisites: ["zakładamy kask :)"]
   },
   {
     name: "221. Przygotowanie pod malowanie/tapetowanie",
