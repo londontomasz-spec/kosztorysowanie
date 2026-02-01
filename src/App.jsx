@@ -218,6 +218,8 @@ function App() {
   const [hourlyRate, setHourlyRate] = useState(200); // Domyślnie 200 PLN
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [showPdfWarning, setShowPdfWarning] = useState(false);
+  const [missingMaterialsCount, setMissingMaterialsCount] = useState(0);
 
   useEffect(() => {
     const disclaimerAccepted = localStorage.getItem('disclaimerAccepted');
@@ -711,15 +713,21 @@ function App() {
     XLSX.writeFile(workbook, `kosztorys_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
-  const handleDownloadPdf = async () => {
+  const handleDownloadPdf = () => {
     // WALIDACJA: Jeśli materiał opłaca wykonawca, sprawdzamy czy ceny są uzupełnione
     if (materialsBy === 'contractor' && pdfOptions.includeMaterialPrices) {
       const missingMaterials = items.filter(item => !item.materialPricePerUnit || item.materialPricePerUnit === 0);
       if (missingMaterials.length > 0) {
-        const proceed = window.confirm(`⚠️ OSTRZEŻENIE: BRAKUJĄCE CENY MATERIAŁÓW\n\nWybrano opcję: "Materiał opłaca: Wykonawca", ale ${missingMaterials.length} pozycji nie ma wpisanej ceny materiału.\n\nCzy mimo to chcesz wygenerować PDF? (Brakujące ceny zostaną wyświetlone jako 0.00)`);
-        if (!proceed) return;
+        setMissingMaterialsCount(missingMaterials.length);
+        setShowPdfWarning(true);
+        return;
       }
     }
+    executePdfDownload();
+  };
+
+  const executePdfDownload = async () => {
+    setShowPdfWarning(false);
 
     const doc = new jsPDF();
 
@@ -1555,6 +1563,44 @@ function App() {
             >
               Rozumiem, przejdź do aplikacji
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL OSTRZEŻENIA PDF (BRAK CEN MATERIAŁÓW) */}
+      {showPdfWarning && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+          <div style={{ background: theme.bgSecondary, padding: 40, borderRadius: 12, maxWidth: 500, width: '90%', border: `4px solid #EF4444`, color: theme.text, boxShadow: '0 20px 50px rgba(0,0,0,0.7)', textAlign: 'center' }}>
+            <div style={{ fontSize: 64, marginBottom: 16 }}>⚠️</div>
+            <h2 style={{ color: '#EF4444', fontSize: 28, fontWeight: 'bold', marginBottom: 16, textTransform: 'uppercase' }}>Uwaga! Ryzyko straty!</h2>
+
+            <p style={{ fontSize: 18, lineHeight: 1.5, marginBottom: 24 }}>
+              Masz <strong style={{ color: '#EF4444' }}>{missingMaterialsCount}</strong> pozycji bez wpisanej ceny materiału, mimo że to Ty (Wykonawca) pokrywasz koszty.
+            </p>
+
+            <div style={{ background: theme.bgTertiary, padding: 20, borderRadius: 8, marginBottom: 32, borderLeft: `4px solid #EF4444` }}>
+              <p style={{ margin: 0, fontSize: 16, fontWeight: 'bold', color: theme.text }}>
+                „Możesz na tym wyliczeniu być grubo w plecy!”
+              </p>
+              <p style={{ margin: '8px 0 0 0', fontSize: 14, color: theme.textSecondary }}>
+                Nie uwzględnienie kosztów materiałów w kosztorysie oznacza, że zapłacisz za nie z własnej kieszeni.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <button
+                onClick={() => setShowPdfWarning(false)}
+                style={{ padding: "16px", background: theme.accent, color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 16, fontWeight: 'bold' }}
+              >
+                WRÓĆ I UZUPEŁNIJ CENY
+              </button>
+              <button
+                onClick={executePdfDownload}
+                style={{ padding: "12px", background: 'transparent', color: theme.textMuted, border: `1px solid ${theme.border}`, borderRadius: 8, cursor: "pointer", fontSize: 14 }}
+              >
+                Rozumiem ryzyko, generuj PDF mimo to
+              </button>
+            </div>
           </div>
         </div>
       )}
