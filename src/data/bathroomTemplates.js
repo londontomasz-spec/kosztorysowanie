@@ -42,7 +42,14 @@ export const BATHROOM_TEMPLATES = {
             // ELEKTRYKA
             { name: "Montaż opraw oświetleniowych", qty: 3, unit: "szt", rhPerUnit: 0.5, materialPricePerUnit: 0 },
             { name: "Montaż gniazd wtykowych", qty: 2, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
+            { name: "Montaż włączników/łączników", qty: 2, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Montaż wentylatora łazienkowego", qty: 1, unit: "szt", rhPerUnit: 0.8, materialPricePerUnit: 0 },
+
+            // SUFIT I MALOWANIE
+            { name: "Gruntowanie sufitu", qty: 6, unit: "m2", rhPerUnit: 0.15, materialPricePerUnit: 2 },
+            { name: "Szpachlowanie ubytków na suficie", qty: 2, unit: "m2", rhPerUnit: 0.4, materialPricePerUnit: 5 },
+            { name: "Dwukrotne malowanie sufitu", qty: 6, unit: "m2", rhPerUnit: 0.45, materialPricePerUnit: 8 },
+            { name: "Malowanie fragmentów ścian (nad płytkami)", qty: 5, unit: "m2", rhPerUnit: 0.45, materialPricePerUnit: 8 },
 
             // WYKOŃCZENIE
             { name: "Montaż listew wykończeniowych", qty: 8, unit: "mb", rhPerUnit: 0.15, materialPricePerUnit: 8 },
@@ -100,8 +107,12 @@ export const BATHROOM_TEMPLATES = {
             // ELEKTRYKA
             { name: "Montaż opraw LED sufitowych", qty: 4, unit: "szt", rhPerUnit: 0.5, materialPricePerUnit: 0 },
             { name: "Montaż gniazd wtykowych", qty: 3, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
+            { name: "Montaż włączników/łączników", qty: 3, unit: "szt", rhPerUnit: 0.3, materialPricePerUnit: 0 },
             { name: "Montaż wentylatora z czujnikiem wilgotności", qty: 1, unit: "szt", rhPerUnit: 1.0, materialPricePerUnit: 0 },
             { name: "Montaż ogrzewania podłogowego (mat)", qty: 4, unit: "m2", rhPerUnit: 0.6, materialPricePerUnit: 80 },
+
+            // DODATKOWE MALOWANIE
+            { name: "Malowanie ścian (powierzchnie bez płytek)", qty: 8, unit: "m2", rhPerUnit: 0.45, materialPricePerUnit: 8 },
 
             // WYKOŃCZENIE
             { name: "Uszczelnienie silikonem", qty: 12, unit: "mb", rhPerUnit: 0.2, materialPricePerUnit: 3 },
