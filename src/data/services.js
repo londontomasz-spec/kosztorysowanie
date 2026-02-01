@@ -3368,7 +3368,7 @@ export const SERVICES = [
     rhPerUnit: 0.15,
     phase: "cleaning",
     prerequisites: ["546. Kontrola jakości sprzątania", "542. Utylizacja resztek chemii"]
-  }
+  },
   {
     name: "549. zakładamy kask",
     rhPerUnit: 0.2,
