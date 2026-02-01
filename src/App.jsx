@@ -1016,12 +1016,25 @@ function App() {
         </div>
       </div>
 
-      {/* NOWE: STAWKA ZA ROBOCZOGODZINĘ I SZABLONY */}
-      <div style={{ background: theme.bgSecondary, padding: 16, borderRadius: 8, marginBottom: 24, border: `1px solid ${theme.border}`, transition: 'all 0.3s' }}>
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ flex: '1 1 250px' }}>
-            <label style={{ display: 'block', marginBottom: 4, fontSize: 14, color: theme.textSecondary }}>
-              Stawka za roboczogodzinę (PLN netto)
+      {/* ZINTEGROWANY PASEK AKCJI I NARZĘDZI */}
+      <div style={{ background: theme.bgSecondary, padding: 20, borderRadius: 8, marginBottom: 24, border: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+
+        {/* LEWA STRONA: PRZYCISKI EDYCJI */}
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <button onClick={addItem} disabled={items.length >= maxItems} style={{ padding: "10px 20px", background: items.length >= maxItems ? theme.bgTertiary : theme.accent, color: "#fff", border: "none", borderRadius: 4, cursor: items.length >= maxItems ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 'bold' }}>
+            ➕ Dodaj pozycję {!profile?.is_premium && `(${items.length}/${maxItems})`}
+          </button>
+          <button onClick={() => setShowTemplateDialog(true)} style={{ padding: "10px 20px", background: '#059669', color: '#fff', border: "none", borderRadius: 4, cursor: 'pointer', fontSize: 14, fontWeight: 'bold' }}>
+            📋 Wstaw szablon
+          </button>
+        </div>
+
+        {/* PRAWA STRONA: EKSPORT I STAWKA */}
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* STAWKA GODZINOWA */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: theme.bgTertiary, padding: '6px 12px', borderRadius: 4 }}>
+            <label style={{ fontSize: 13, color: theme.textSecondary, whiteSpace: 'nowrap' }}>
+              Stawka RH:
             </label>
             <input
               type="number"
@@ -1030,37 +1043,27 @@ function App() {
               min="0"
               step="1"
               style={{
-                width: '100%',
-                padding: '8px',
+                width: 60,
+                padding: '4px',
                 background: theme.inputBg,
                 border: `1px solid ${theme.borderLight}`,
                 color: theme.text,
                 borderRadius: 4,
-                boxSizing: 'border-box',
-                fontSize: 16
+                textAlign: 'right',
+                fontWeight: 'bold'
               }}
             />
-            <small style={{ color: theme.textSecondary, fontSize: 12 }}>
-              Rekomendowana: 34 PLN (podstawowa) lub 40 PLN (specjalistyczna)
-            </small>
+            <span style={{ fontSize: 13, color: theme.textMuted }}>PLN</span>
           </div>
-          <div style={{ flex: '0 0 auto', alignSelf: 'flex-end' }}>
-            <button
-              onClick={() => setShowTemplateDialog(true)}
-              style={{
-                padding: '10px 20px',
-                background: '#10b981',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 4,
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: 14
-              }}
-            >
-              📋 Wstaw szablon łazienki
-            </button>
-          </div>
+
+          <div style={{ height: 24, width: 1, background: theme.borderLight }}></div>
+
+          <button onClick={() => setShowPdfOptions(true)} style={{ padding: "10px 16px", background: theme.bgTertiary, color: theme.text, border: `1px solid ${theme.border}`, borderRadius: 4, cursor: "pointer", fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+            📄 PDF
+          </button>
+          <button onClick={handleDownloadExcel} style={{ padding: "10px 16px", background: theme.bgTertiary, color: theme.text, border: `1px solid ${theme.border}`, borderRadius: 4, cursor: "pointer", fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+            📊 Excel
+          </button>
         </div>
       </div>
 
@@ -1258,18 +1261,7 @@ function App() {
         ))}
       </div>
 
-      {/* PRZYCISKI AKCJI */}
-      <div style={{ marginBottom: 24, position: 'relative', zIndex: 1 }}>
-        <button onClick={addItem} disabled={items.length >= maxItems} style={{ padding: "12px 24px", background: items.length >= maxItems ? theme.bgTertiary : theme.accent, color: "#fff", border: "none", borderRadius: 4, cursor: items.length >= maxItems ? "not-allowed" : "pointer", fontSize: 16, fontWeight: 500 }}>
-          Dodaj pozycje {!profile?.is_premium && `(${items.length}/${maxItems})`}
-        </button>
-        <button onClick={() => setShowPdfOptions(true)} style={{ marginLeft: 12, padding: "12px 24px", background: "#1d4ed8", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 16, fontWeight: 500 }}>
-          📄 Pobierz PDF
-        </button>
-        <button onClick={handleDownloadExcel} style={{ marginLeft: 12, padding: "12px 24px", background: "#059669", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 16, fontWeight: 500 }}>
-          📊 Eksport Excel
-        </button>
-      </div>
+      {/* STARE PRZYCISKI - USUNIĘTO (Przeniesione wyżej) */}
 
       {/* USTAWIENIA */}
       <div style={{ background: theme.bgSecondary, padding: 20, borderRadius: 8, border: `1px solid ${theme.border}`, marginBottom: 24, position: 'relative', zIndex: 1, transition: 'all 0.3s' }}>
